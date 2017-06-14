@@ -16,3 +16,4 @@
 /vendor/
 /web/bundles/
 /gphoto/node_modules
+*.AppleDouble/
