@@ -3,11 +3,19 @@ RaspiCamera
 
 ## Index
 
+<<<<<<< HEAD
 1. [Install Raspbian](#1--install-raspbian)
 2. [Configure Hostspot](#2-configure-hostspot)
 3. [Install gphoto2](#3-install-gphoto2)
 4. [Configure WebServer](#4-configure-webserver)
 5. [Deploy RaspiCamera](#5-deploy-raspicamera)
+=======
+1. Install Raspbian
+2. Configure Hostspot
+3. Install gphoto2
+4. Configure WebServer
+5. Deploy RaspiCamera
+>>>>>>> a2ee687beb2e6838d6be645d159d120410d5ec70
 
 # 1.  Install Raspbian
 
