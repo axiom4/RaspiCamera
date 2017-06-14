@@ -1,10 +1,10 @@
 <?php
 
-namespace GPhotoBundle\Tests\Controller;
+namespace RaspiCameraBundle\Tests\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
-class GPhotoControllerTest extends WebTestCase
+class RaspiCameraControllerTest extends WebTestCase
 {
     public function testListphoto()
     {

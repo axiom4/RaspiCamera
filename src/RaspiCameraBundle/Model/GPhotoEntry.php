@@ -1,6 +1,6 @@
 <?php
 
-namespace GPhotoBundle\Model;
+namespace RaspiCameraBundle\Model;
 
 class GPhotoEntry {
 	/**

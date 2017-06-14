@@ -1,6 +1,6 @@
 <?php
 
-namespace GPhotoBundle\Tests\Controller;
+namespace RaspiCameraBundle\Tests\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 

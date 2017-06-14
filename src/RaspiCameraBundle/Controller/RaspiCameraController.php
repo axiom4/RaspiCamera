@@ -1,6 +1,6 @@
 <?php
 
-namespace GPhotoBundle\Controller;
+namespace RaspiCameraBundle\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
@@ -12,7 +12,7 @@ use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
 
-class GPhotoController extends Controller
+class RaspiCameraController extends Controller
 {
     /**
      * @Route("/api/photos", name="listPhotos")
@@ -20,7 +20,7 @@ class GPhotoController extends Controller
     public function listPhotosAction() {
 		$response = new Response();
 		
-		$gphoto_service = $this->get('gphoto.gphoto_service');
+		$gphoto_service = $this->get('raspicamera.raspicamera_service');
 		
 		$var = $gphoto_service->fetchGPhotoList();
 		
@@ -36,7 +36,7 @@ class GPhotoController extends Controller
      */
     public function getPhotosByIdAction(Request $request, $id) {
 		
-		$gphoto_service = $this->get('gphoto.gphoto_service');
+		$gphoto_service = $this->get('raspicamera.raspicamera_service');
 		
 		$fileContent = $gphoto_service->fetchGPhotoFile($id);
         $filemime = json_decode($gphoto_service->fetchGPhotoMimeType($id));
@@ -58,7 +58,7 @@ class GPhotoController extends Controller
      */
     public function getPhotoPreviewByIdAction(Request $request, $id) {
 		
-		$gphoto_service = $this->get('gphoto.gphoto_service');
+		$gphoto_service = $this->get('raspicamera.raspicamera_service');
 		
 		$fileContent = $gphoto_service->fetchGPhotoPreview($id);
         $filemime = json_decode($gphoto_service->fetchGPhotoMimeType($id));
@@ -82,7 +82,7 @@ class GPhotoController extends Controller
      */
     public function getPhotoInfoByIdAction(Request $request, $id) {
 		
-		$gphoto_service = $this->get('gphoto.gphoto_service');
+		$gphoto_service = $this->get('raspicamera.raspicamera_service');
 		
 		$fileContent = $gphoto_service->fetchGPhotoInfo($id);
 
@@ -97,7 +97,7 @@ class GPhotoController extends Controller
      */
     public function getPhotoInfoMimeTypeByIdAction(Request $request, $id) {
 		
-		$gphoto_service = $this->get('gphoto.gphoto_service');
+		$gphoto_service = $this->get('raspicamera.raspicamera_service');
 		
 		$fileContent = $gphoto_service->fetchGPhotoMimeType($id);
 
@@ -112,7 +112,7 @@ class GPhotoController extends Controller
      */
     public function getPhotoExifByIdAction(Request $request, $id) {
 		
-		$gphoto_service = $this->get('gphoto.gphoto_service');
+		$gphoto_service = $this->get('raspicamera.raspicamera_service');
 		
 		$fileContent = $gphoto_service->fetchGPhotoExif($id);
 

@@ -1,0 +1,4 @@
+services:
+  raspicamera.raspicamera_service:
+    class: RaspiCameraBundle\Service\RaspiCameraService
+    arguments: ['@kernel']

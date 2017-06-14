@@ -1,10 +1,10 @@
 <?php
 
-namespace GPhotoBundle\Service;
+namespace RaspiCameraBundle\Service;
 
-use GPhotoBundle\Model\GPhotoEntry;
+use RaspiCameraBundle\Model\GPhotoEntry;
 
-class GPhotoService {
+class RaspiCameraService {
     private $gphoto_exec;
 
     public function __construct($kernel) {
