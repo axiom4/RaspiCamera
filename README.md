@@ -1,4 +1,7 @@
-gphoto
+RaspiCamera
 ======
 
-A Symfony project created on June 10, 2017, 10:33 am.
+## Index
+
+1. Install Raspbian
+2. Configure Hostspot
