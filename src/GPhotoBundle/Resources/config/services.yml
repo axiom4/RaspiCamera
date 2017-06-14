@@ -1,0 +1,4 @@
+services:
+  gphoto.gphoto_service:
+    class: GPhotoBundle\Service\GPhotoService
+    arguments: ['@kernel']
