@@ -91,7 +91,115 @@ denyinterfaces wlan0
 
 # 3. Install gphoto2
 
-TODO
+1. Updating sources
+
+```
+apt-get update -qq
+```
+
+2. Removing gphoto2 and libgphoto2 if exists
+
+```
+apt-get remove -y gphoto2 libgphoto2*
+```
+
+3. Installing dependencies
+
+```
+apt-get install -y build-essential libltdl-dev libusb-dev libexif-dev libpopt-dev libudev-dev pkg-config git automake autoconf autopoint gettext libtool wget
+```
+
+4. Creating temporary folder
+
+```
+mkdir gphoto2-temp-folder
+cd gphoto2-temp-folder
+```
+
+5. Downloading libgphoto2
+
+```
+git clone --branch  libgphoto2-2-2_5_14-release https://github.com/gphoto/libgphoto2.git
+cd libgphoto2/
+```
+
+6. Compiling and installing libgphoto2
+
+```
+autoreconf --install --symlink
+./configure
+make -j "$cores"
+make install
+cd ..
+```
+
+7. Downloading gphoto2
+
+```
+git clone  gphoto2-2-2_5_14-release https://github.com/gphoto/gphoto2.git
+cd gphoto2
+```
+
+8. Compiling and installing gphoto2
+
+```
+autoreconf --install --symlink
+./configure
+make -j "$cores"
+make install
+cd ..
+```
+
+9. Linking libraries
+
+```
+ldconfig
+```
+
+10. Generating udev rules, see http://www.gphoto.org/doc/manual/permissions-usb.html
+
+```
+udev_version=$(udevd --version)
+
+if   [ "$udev_version" -ge "201" ]
+then
+  udev_rules=201
+elif [ "$udev_version" -ge "175" ]
+then
+  udev_rules=175
+elif [ "$udev_version" -ge "136" ]
+then
+  udev_rules=136
+else
+  udev_rules=0.98
+fi
+
+/usr/local/lib/libgphoto2/print-camera-list udev-rules version $udev_rules group plugdev mode 0660 > /etc/udev/rules.d/90-libgphoto2.rules
+
+if   [ "$udev_rules" = "201" ]
+then
+  echo
+  echo "------------------------------------------------------------------------"
+  echo "Generating hwdb file in /etc/udev/hwdb.d/20-gphoto.hwdb. Ignore the NOTE"
+  echo "------------------------------------------------------------------------"
+  echo
+  /usr/local/lib/libgphoto2/print-camera-list hwdb > /etc/udev/hwdb.d/20-gphoto.hwdb
+fi
+```
+
+
+11. Removing temp files
+
+```
+cd ..
+rm -r gphoto2-temp-folder
+```
+
+12. Finished!! Enjoy it!
+
+```
+gphoto2 --version
+```
 
 # 4. Configure WebServer
 
