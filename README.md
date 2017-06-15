@@ -171,7 +171,7 @@ sudo echo "/home/pi/arch/lib" > /etc/ld.so.conf.d/pihome.conf
 
 ```
 # sudo $HOME/arch/lib/libgphoto2/print-camera-list udev-rules version 201 group plugdev mode 0660 > /etc/udev/rules.d/90-libgphoto2.rules
-# $HOME/arch/lib/libgphoto2/print-camera-list hwdb > /etc/udev/hwdb.d/20-gphoto.hwdb
+# sudo $HOME/arch/lib/libgphoto2/print-camera-list hwdb > /etc/udev/hwdb.d/20-gphoto.hwdb
 ```
 
 9. Testing Gphoto2
