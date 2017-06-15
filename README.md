@@ -94,62 +94,91 @@ denyinterfaces wlan0
 1. Updating sources
 
 ```
-# apt-get update -qq
+# sudo apt-get update -qq
 ```
 
 2. Removing gphoto2 and libgphoto2 if exists
 
 ```
-# apt-get remove -y gphoto2 libgphoto2*
+# sudo apt-get remove -y gphoto2 libgphoto2*
 ```
 
 3. Installing dependencies
 
 ```
-# apt-get install -y build-essential libltdl-dev libusb-dev libexif-dev libpopt-dev libudev-dev pkg-config git automake autoconf autopoint gettext libtool wget
+# sudo apt-get install -y build-essential libltdl-dev libusb-dev libexif-dev libpopt-dev libudev-dev pkg-config git automake autoconf autopoint gettext libtool wget libgd-dev libxml2-dev libreadline-dev libcdk5-dev 
 ```
 
-4. Compiling and installing libgphoto2
+4. Create arch binary home
+
+As user *pi*
 
 ```
-# git clone --branch  libgphoto2-2-2_5_14-release https://github.com/gphoto/libgphoto2.git
+# cd $HOME
+# mkdir $HOME/arch/bin 
+# mkdir $HOME/arch/lib 
+```
+
+Edit *$HOME/.profile
+
+```
+# Append this lines
+PATH="$HOME/arch/bin:$PATH"
+# set PATH so it includes user's private bin if it exists
+if [ -d "$HOME/bin" ] ; then
+    PATH="$HOME/bin:$PATH"
+fi
+```
+
+Create */etc/ld.so.conf.d/pihome.conf*
+
+```
+sudo echo "/home/pi/arch/lib" > /etc/ld.so.conf.d/pihome.conf
+```
+
+**Logoff and re-login to system**
+
+5. Compiling and installing libgphoto2
+
+```
+# git clone --branch libgphoto2-2_5_14-release https://github.com/gphoto/libgphoto2.git
 # cd libgphoto2/
 # autoreconf --install --symlink
-# ./configure
-# make -j "$cores"
+# ./configure --prefix=$HOME/arch
+# make
 # make install
 # cd ..
 ```
 
-5. Compiling and installing gphoto2
+6. Compiling and installing gphoto2
 
 ```
-# git clone  gphoto2-2-2_5_14-release https://github.com/gphoto/gphoto2.git
+# git clone --branch gphoto2-2_5_14-release https://github.com/gphoto/gphoto2.git
 # cd gphoto2
 # autoreconf --install --symlink
-# ./configure
-# make -j "$cores"
+# CFLAGS=$(gphoto2-config --cflags) LDFLAGS=$(gphoto2-config --libs) ./configure --prefix=$HOME/arch --with-libgphoto2=$HOME/arch
+# make
 # make install
 # cd ..
 ```
 
-6. Update libraries cache
+7. Update libraries cache
 
 ```
-# ldconfig
+# sudo ldconfig
 ```
 
-7. Generating udev rules
+8. Generating udev rules
 
 ```
-# sudo /usr/local/lib/libgphoto2/print-camera-list udev-rules version 201 group plugdev mode 0660 > /etc/udev/rules.d/90-libgphoto2.rules
-# /usr/local/lib/libgphoto2/print-camera-list hwdb > /etc/udev/hwdb.d/20-gphoto.hwdb
+# sudo $HOME/arch/lib/libgphoto2/print-camera-list udev-rules version 201 group plugdev mode 0660 > /etc/udev/rules.d/90-libgphoto2.rules
+# $HOME/arch/lib/libgphoto2/print-camera-list hwdb > /etc/udev/hwdb.d/20-gphoto.hwdb
 ```
 
-8. Testing Gphoto2
+9. Testing Gphoto2
 
 ```
-gphoto2 --version
+# gphoto2 --version
 ```
 
 # 4. Configure WebServer
