@@ -123,10 +123,9 @@ Edit *$HOME/.profile
 
 ```
 # Append this lines
-PATH="$HOME/arch/bin:$PATH"
-# set PATH so it includes user's private bin if it exists
-if [ -d "$HOME/bin" ] ; then
-    PATH="$HOME/bin:$PATH"
+# set PATH so it includes user's private arch/bin if it exists
+if [ -d "$HOME/arch/bin" ] ; then
+    PATH="$HOME/arch/bin:$PATH"
 fi
 ```
 
