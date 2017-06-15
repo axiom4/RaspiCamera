@@ -17,12 +17,14 @@ class RaspiCameraController extends Controller
     /**
      * @Route("/api/photos", name="listPhotos")
      */
-    public function listPhotosAction() {
+    public function listPhotosAction(Request $request) {
+        $new = ($request->query->has('new') ? 1 : 0);
+
 		$response = new Response();
 		
 		$gphoto_service = $this->get('raspicamera.raspicamera_service');
 		
-		$var = $gphoto_service->fetchGPhotoList();
+		$var = $gphoto_service->fetchGPhotoList($new);
 		
 		$response->setContent(json_encode($var));
 		

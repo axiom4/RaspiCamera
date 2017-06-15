@@ -11,9 +11,11 @@ class RaspiCameraService {
         $this->gphoto_exec = $kernel->getContainer()->getParameter('gphoto2_path');
     }
 
-    public function fetchGPhotoList() {
+    public function fetchGPhotoList($new) {
         $response = array();
-        exec($this->gphoto_exec . " --list-files", $output);
+        $command = $this->gphoto_exec . ($new ? " --new" : "") . " --list-files";
+
+        exec($command, $output);
 
         foreach ($output as $line) {
             if(preg_match("/^#(?<id>[0-9]+)\s+(?<filename>[\w\.]+)\s+rd\s+(?<filesize>[0-9]+ KB)\s+(?<fileres>[0-9x]*)\s*(?<filetype>[\w\/-]+)$/", $line, $match)) {
@@ -35,7 +37,7 @@ class RaspiCameraService {
     }
 
     public function fetchGPhotoFile($id) {
-        $command = $this->gphoto_exec . " --stdout --get-file=$id 2>&1";
+        $command = $this->gphoto_exec . " --stdout --get-file=$id";
 
         $fp = popen($command, "r");
 
@@ -56,7 +58,7 @@ class RaspiCameraService {
     }
 
     public function fetchGPhotoPreview($id) {
-        $command = $this->gphoto_exec . " --stdout --get-thumbnail=$id 2>&1";
+        $command = $this->gphoto_exec . " --stdout --get-thumbnail=$id";
 
         $fp = popen($command, "r");
 
