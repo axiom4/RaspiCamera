@@ -1,5 +1,6 @@
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
+import { HttpModule } from '@angular/http';
 
 import { AppComponent } from './app.component';
 import { RaspiCameraModule } from './raspi-camera/raspi-camera.module';
@@ -10,6 +11,7 @@ import { RaspiCameraModule } from './raspi-camera/raspi-camera.module';
   ],
   imports: [
     BrowserModule,
+    HttpModule,
     RaspiCameraModule
   ],
   providers: [],
