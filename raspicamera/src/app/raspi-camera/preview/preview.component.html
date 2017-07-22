@@ -1,5 +1,5 @@
 <ul>
     <li *ngFor="let photo of photos">
-        {{photo.filename}}
+        <img src="/tmp/thumb_{{photo.filename}}" /> {{photo.filename}}
     </li>
 </ul>

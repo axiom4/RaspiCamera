@@ -6,9 +6,11 @@ use RaspiCameraBundle\Model\GPhotoEntry;
 
 class RaspiCameraService {
     private $gphoto_exec;
+    private $preview_path;
 
     public function __construct($kernel) {
         $this->gphoto_exec = $kernel->getContainer()->getParameter('gphoto2_path');
+        $this->preview_path = $kernel->getContainer()->getParameter('preview_path');
     }
 
     public function fetchGPhotoList($new) {
@@ -58,8 +60,19 @@ class RaspiCameraService {
     }
 
     public function fetchGPhotoPreview($id) {
-        $command = $this->gphoto_exec . " --stdout --get-thumbnail=$id";
+        $image = $this->preview_path . "thumb_$id.jpg";
+        $command = $this->gphoto_exec . " --stdout --get-thumbnail=$id >  $image";
 
+        $run = system($command, $ret);
+
+        if ($ret == 0) {
+            return json_encode(array('filename' => $image, 'mimetype' => 'image/jpg'));
+        }
+
+        return '{}';
+
+
+/*
         $fp = popen($command, "r");
 
         $var = null;
@@ -76,6 +89,7 @@ class RaspiCameraService {
         fclose($fp);
 
         return $var;
+*/
     }
 
     public function fetchGPhotoInfo($id) {

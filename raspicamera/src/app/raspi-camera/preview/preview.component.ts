@@ -21,7 +21,7 @@ export class PreviewComponent implements OnInit {
   ngOnInit() {
     this.raspiCameraGphotoService.getCameraPhotos()
       .subscribe(photos => {
-        this.photos = photos
+        this.photos = photos;
       })
   }
 
