@@ -15,9 +15,11 @@
 !webapp/var/SymfonyRequirements.php
 /webapp/vendor/
 /webapp/web/bundles/
+/webapp/web/tmp/
 /webapp/gphoto/node_modules
 *.AppleDouble/
 /webapp/src/RaspiCameraBundle/Resources/public/
+/RaspiCameraDaemon/.dep.inc
 /RaspiCameraDaemon/dist/
 /RaspiCameraDaemon/build/
 /RaspiCameraDaemon/nbproject/private/
