@@ -36,6 +36,7 @@ OBJECTDIR=${CND_BUILDDIR}/${CND_CONF}/${CND_PLATFORM}
 # Object Files
 OBJECTFILES= \
 	${OBJECTDIR}/src/camera-utils.o \
+	${OBJECTDIR}/src/config.o \
 	${OBJECTDIR}/src/daemon.o \
 	${OBJECTDIR}/src/main.o \
 	${OBJECTDIR}/src/signal.o \
@@ -71,6 +72,11 @@ ${OBJECTDIR}/src/camera-utils.o: src/camera-utils.c
 	${MKDIR} -p ${OBJECTDIR}/src
 	${RM} "$@.d"
 	$(COMPILE.c) -g -I/home/pi/arch/include -Iinclude -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/camera-utils.o src/camera-utils.c
+
+${OBJECTDIR}/src/config.o: src/config.c
+	${MKDIR} -p ${OBJECTDIR}/src
+	${RM} "$@.d"
+	$(COMPILE.c) -g -I/home/pi/arch/include -Iinclude -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/config.o src/config.c
 
 ${OBJECTDIR}/src/daemon.o: src/daemon.c
 	${MKDIR} -p ${OBJECTDIR}/src

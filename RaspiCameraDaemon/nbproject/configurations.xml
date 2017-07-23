@@ -14,6 +14,7 @@
                    displayName="Source Files"
                    projectFiles="true">
       <itemPath>src/camera-utils.c</itemPath>
+      <itemPath>src/config.c</itemPath>
       <itemPath>src/daemon.c</itemPath>
       <itemPath>src/main.c</itemPath>
       <itemPath>src/signal.c</itemPath>
@@ -75,6 +76,8 @@
       </item>
       <item path="src/camera-utils.c" ex="false" tool="0" flavor2="0">
       </item>
+      <item path="src/config.c" ex="false" tool="0" flavor2="0">
+      </item>
       <item path="src/daemon.c" ex="false" tool="0" flavor2="0">
       </item>
       <item path="src/main.c" ex="false" tool="0" flavor2="0">
@@ -109,6 +112,8 @@
       <item path="include/RaspiCameraDaemon.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="src/camera-utils.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="src/config.c" ex="false" tool="0" flavor2="0">
       </item>
       <item path="src/daemon.c" ex="false" tool="0" flavor2="0">
       </item>
