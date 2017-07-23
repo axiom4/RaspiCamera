@@ -6,7 +6,7 @@ RaspiCamera
 1. [Install Raspbian](#1--install-raspbian)
 2. [Configure Hostspot](#2-configure-hostspot)
 3. [Install gphoto2](#3-install-gphoto2)
-4. [Install libusb-1.0](#4-install-libusb)
+4. [Install libusb-1.0](#4-install-libusb-10)
 5. [Configure WebServer](#5-configure-webserver)
 6. [Deploy RaspiCamera](#6-deploy-raspicamera)
 
