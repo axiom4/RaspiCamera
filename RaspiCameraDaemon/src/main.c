@@ -31,164 +31,98 @@
 
 #include <RaspiCameraDaemon.h>
 
-void rdc_usage(int argc, char**argv) {
+#include <getopt.h>
+
+int rcd_exit = 0;
+
+void rcd_usage(int argc, char**argv) {
     printf(
-            "Usage: %s [ -c config ] [ -l log ] [ -h ]\n"
-            "\t-c [config]\tconfig file\n"
-            "\t-l [log]\tlog file\n"
-            "\t-h\t\thelp\n", argv[0]);
+            "Usage: %s [OPTIONS]\n\n"
+            "  -c [CONFIG], --config [CONFIG]\n\t\tSpecify config file [required]\n"
+            "  -D, --daemon\n\t\tEnable process background\n"
+            "  -h, --help\n\t\tThis help\n", basename(argv[0]));
     exit(1);
 }
 
+static struct option long_options[] = {
+    {"config", required_argument, NULL, 'c'},
+    {"daemon", no_argument, NULL, 'D'},
+    {"help", no_argument, NULL, 'h'},
+    {NULL, 0, NULL, 0}
+};
+
 int main(int argc, char** argv) {
-    Camera **camera_array = NULL;
-    GPContext *context = NULL;
-    CameraText text;
-    int i;
-    int count;
-    int c;
+    int c, ret;
+    int option_index = 0;
 
-    const char *configfile = NULL;
-    const char *logfile = NULL;
+    void *status;
 
-    while ((c = getopt(argc, argv, "c:l:h")) != -1) {
+    RcdRunConfig config;
+    pthread_t t_usb_detect;
+    pthread_attr_t attr;
+
+    config.configfile = NULL;
+    config.daemonize = 0;
+
+    rcd_signal(SIGINT, &rcd_sig_term);
+    rcd_signal(SIGPIPE, &rcd_sig_pipe);
+
+    while ((c = getopt_long(argc, argv, "c:Dh", long_options, &option_index)) != -1) {
         switch (c) {
             case 'c':
-                configfile = optarg;
+                config.configfile = optarg;
                 break;
-            case 'l':
-                logfile = optarg;
+            case 'D':
+                config.daemonize = 1;
                 break;
             case 'h':
-                rdc_usage(argc, argv);
+                rcd_usage(argc, argv);
                 break;
             default:
-                rdc_usage(argc, argv);
+                rcd_usage(argc, argv);
                 break;
         }
     }
-    //rcd_daemon_init();
 
-    rdc_usb_device_connection_init();
-    
-    CameraList *list = NULL;
-    gp_list_new(&list);
-
-    int ret;
-
-    context = create_context();
-
-    ret = gp_camera_autodetect(list, context);
-
-    if (ret < GP_OK) {
-        fprintf(stderr, "Camera failed retrieving summary.\n");
-        gp_context_unref(context);
-
-        return EXIT_FAILURE;
+    if (optind < argc) {
+        printf("non-option ARGV-elements: ");
+        while (optind < argc)
+            printf("%s ", argv[optind++]);
+        printf("\n");
     }
 
-    count = gp_list_count(list);
-
-    if (count) {
-
-        camera_array = calloc(sizeof (Camera*), count);
-
-        bzero(camera_array, sizeof (Camera*) * count);
-
-        for (i = 0; i < count; i++) {
-            const char *name, *value;
-            gp_list_get_name(list, i, &name);
-            gp_list_get_value(list, i, &value);
-
-            ret = open_camera(&camera_array[i], name, value, context);
-
-            if (ret < GP_OK)
-                fprintf(stderr, "Camera %s on port %s failed to open\n", name, value);
-
-            gp_camera_init(camera_array[i], context);
-
-            ret = gp_camera_get_summary(camera_array[i], &text, context);
-            if (ret < GP_OK) {
-                fprintf(stderr, "Camera failed retrieving summary.\n");
-                gp_context_unref(context);
-
-                return EXIT_FAILURE;
-            }
-
-            printf("Summary:\n%s\n", text.text);
-
-            CameraStorageInformation *info;
-
-            int store_count;
-
-            gp_camera_get_storageinfo(camera_array[i], &info, &store_count, context);
-
-            for (c = 0; c < store_count; c++) {
-                folder_list_folders(camera_array[i], info[c].basedir, context);
-            }
-
-            free(info);
-        }
+    if (!config.configfile) {
+        rcd_usage(argc, argv);
     }
 
-    gp_list_free(list);
+    rcd_config_parse(config.configfile);
 
-    for (i = 0; i < count; i++) {
-        gp_camera_exit(camera_array[i], context);
-        gp_camera_unref(camera_array[i]);
+    if (config.daemonize)
+        rcd_daemon_init();
+
+
+    pthread_attr_init(&attr);
+    pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_JOINABLE);
+
+    ret = pthread_create(&t_usb_detect, &attr, rcd_usb_device_connection_init, NULL);
+
+    if (ret) {
+        printf("ERROR; return code from pthread_create() is %d\n", ret);
+        exit(-1);
     }
 
-    free(camera_array);
+    while (!rcd_exit) {
+        pause();
+    }
 
-    gp_port_info_list_free(portinfolist);
-    gp_abilities_list_free(abilities);
+    pthread_attr_destroy(&attr);
+    ret = pthread_join(t_usb_detect, &status);
+    if (ret) {
+        printf("ERROR; return code from pthread_join() is %d\n", ret);
+        exit(-1);
+    }
+    printf("Main: completed join with thread having a status of % ld\n",(long)status);
 
-    gp_context_unref(context);
-    /*
-        for (i = 0; i < count; i++) {
-            char *name = NULL;
-            char *value = NULL;
-
-            gp_list_get_name(list, i, (const char **) &name);
-            gp_list_get_value(list, i, (const char **) &value);
-
-            printf("%s - %s\n", name, value);
-        }
-
-        gp_list_free(list);
-
-        gp_abilities_list_new(&cAbilitiesList);
-
-        gp_abilities_list_free(cAbilitiesList);
-
-        gp_camera_new(&camera);
-
-        if (gp_camera_init(camera, context) < GP_OK) {
-            fprintf(stderr, "No camera Found!\n");
-            gp_camera_unref(camera);
-            gp_context_unref(context);
-
-            return EXIT_FAILURE;
-        }
-        gp_camera_set_timeout_funcs(camera, (CameraTimeoutStartFunc) start_timeout_func, (CameraTimeoutStopFunc) stop_timeout_func, NULL);
-
-        ret = gp_camera_get_summary(camera, &text, context);
-        if (ret < GP_OK) {
-            fprintf(stderr, "Camera failed retrieving summary.\n");
-            gp_camera_unref(camera);
-            gp_context_unref(context);
-
-            return EXIT_FAILURE;
-        }
-
-        printf("Summary:\n%s\n", text.text);
-
-        //folder_list_folders(camera, "/", context);
-
-        gp_camera_exit(camera, context);
-        gp_camera_unref(camera);
-        gp_context_unref(context);
-     */
-    return (EXIT_SUCCESS);
+    pthread_exit(NULL);
 }
 

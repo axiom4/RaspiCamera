@@ -57,6 +57,8 @@
 static GPPortInfoList *portinfolist = NULL;
 static CameraAbilitiesList *abilities = NULL;
 
+extern int rcd_exit;
+
 struct _ThreadData {
     Camera *camera;
     time_t timeout;
@@ -65,10 +67,22 @@ struct _ThreadData {
 
 typedef struct _ThreadData ThreadData;
 
+struct _RcdRunConfig {
+    const char *configfile;
+    int daemonize;
+};
+
+typedef struct _RcdRunConfig RcdRunConfig;
+
 GPContext* create_context();
+
 void (*rcd_signal(int signo, void (*func)(int)))(int);
+void rcd_sig_pipe(int signo);
+void rcd_sig_term(int signo);
+
 int rcd_daemon_init();
-int rdc_usb_device_connection_init();
+void *rcd_usb_device_connection_init(void *t);
+void rcd_config_parse(const char *filename);
 
 #endif /* RASPICAMERADAEMON_H */
 
