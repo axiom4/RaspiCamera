@@ -6,8 +6,9 @@ RaspiCamera
 1. [Install Raspbian](#1--install-raspbian)
 2. [Configure Hostspot](#2-configure-hostspot)
 3. [Install gphoto2](#3-install-gphoto2)
-4. [Configure WebServer](#4-configure-webserver)
-5. [Deploy RaspiCamera](#5-deploy-raspicamera)
+4. [Install libusb-1.0](#4-install-libusb-10)
+5. [Configure WebServer](#5-configure-webserver)
+6. [Deploy RaspiCamera](#6-deploy-raspicamera)
 
 # 1.  Install Raspbian
 
@@ -180,10 +181,24 @@ sudo echo "/home/pi/arch/lib" > /etc/ld.so.conf.d/pihome.conf
 # gphoto2 --version
 ```
 
-# 4. Configure WebServer
+# 4. Install libusb-1.0
+
+1. Compiling and installing libusb-1.0
+
+```
+# git clone --branch v1.0.21 https://github.com/libusb/libusb.git
+# cd libusb
+# autoreconf --install --symlink
+# ./configure --prefix=$HOME/arch --enable-system-log --enable-udev
+# make
+# make install
+# cd ..
+```
+
+# 5. Configure WebServer
 
 TODO
 
-# 5. Deploy RaspiCamera
+# 6. Deploy RaspiCamera
 
 TODO
