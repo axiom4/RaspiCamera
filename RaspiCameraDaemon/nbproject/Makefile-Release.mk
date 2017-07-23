@@ -35,7 +35,12 @@ OBJECTDIR=${CND_BUILDDIR}/${CND_CONF}/${CND_PLATFORM}
 
 # Object Files
 OBJECTFILES= \
-	${OBJECTDIR}/main.o
+	${OBJECTDIR}/src/camera-utils.o \
+	${OBJECTDIR}/src/daemon.o \
+	${OBJECTDIR}/src/main.o \
+	${OBJECTDIR}/src/signal.o \
+	${OBJECTDIR}/src/usb_device.o \
+	${OBJECTDIR}/src/utils.o
 
 
 # C Compiler Flags
@@ -62,10 +67,35 @@ ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/raspicameradaemon: ${OBJECTFILES}
 	${MKDIR} -p ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}
 	${LINK.c} -o ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/raspicameradaemon ${OBJECTFILES} ${LDLIBSOPTIONS}
 
-${OBJECTDIR}/main.o: main.c
-	${MKDIR} -p ${OBJECTDIR}
+${OBJECTDIR}/src/camera-utils.o: src/camera-utils.c
+	${MKDIR} -p ${OBJECTDIR}/src
 	${RM} "$@.d"
-	$(COMPILE.c) -O2 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/main.o main.c
+	$(COMPILE.c) -O2 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/camera-utils.o src/camera-utils.c
+
+${OBJECTDIR}/src/daemon.o: src/daemon.c
+	${MKDIR} -p ${OBJECTDIR}/src
+	${RM} "$@.d"
+	$(COMPILE.c) -O2 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/daemon.o src/daemon.c
+
+${OBJECTDIR}/src/main.o: src/main.c
+	${MKDIR} -p ${OBJECTDIR}/src
+	${RM} "$@.d"
+	$(COMPILE.c) -O2 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/main.o src/main.c
+
+${OBJECTDIR}/src/signal.o: src/signal.c
+	${MKDIR} -p ${OBJECTDIR}/src
+	${RM} "$@.d"
+	$(COMPILE.c) -O2 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/signal.o src/signal.c
+
+${OBJECTDIR}/src/usb_device.o: src/usb_device.c
+	${MKDIR} -p ${OBJECTDIR}/src
+	${RM} "$@.d"
+	$(COMPILE.c) -O2 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/usb_device.o src/usb_device.c
+
+${OBJECTDIR}/src/utils.o: src/utils.c
+	${MKDIR} -p ${OBJECTDIR}/src
+	${RM} "$@.d"
+	$(COMPILE.c) -O2 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/utils.o src/utils.c
 
 # Subprojects
 .build-subprojects:

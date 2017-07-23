@@ -4,6 +4,7 @@
     <logicalFolder name="HeaderFiles"
                    displayName="Header Files"
                    projectFiles="true">
+      <itemPath>include/RaspiCameraDaemon.h</itemPath>
     </logicalFolder>
     <logicalFolder name="ResourceFiles"
                    displayName="Resource Files"
@@ -12,7 +13,12 @@
     <logicalFolder name="SourceFiles"
                    displayName="Source Files"
                    projectFiles="true">
-      <itemPath>main.c</itemPath>
+      <itemPath>src/camera-utils.c</itemPath>
+      <itemPath>src/daemon.c</itemPath>
+      <itemPath>src/main.c</itemPath>
+      <itemPath>src/signal.c</itemPath>
+      <itemPath>src/usb_device.c</itemPath>
+      <itemPath>src/utils.c</itemPath>
     </logicalFolder>
     <logicalFolder name="TestFiles"
                    displayName="Test Files"
@@ -38,6 +44,7 @@
         <cTool>
           <incDir>
             <pElem>/home/pi/arch/include</pElem>
+            <pElem>include</pElem>
           </incDir>
           <commandLine>-pthread -ggdb</commandLine>
         </cTool>
@@ -45,15 +52,38 @@
           <linkerAddLib>
             <pElem>/home/pi/arch/lib</pElem>
           </linkerAddLib>
+          <linkerDynSerch>
+            <pElem>/home/pi/arch/lib</pElem>
+          </linkerDynSerch>
           <commandlineTool>gcc</commandlineTool>
           <linkerLibItems>
             <linkerLibLibItem>gphoto2</linkerLibLibItem>
             <linkerLibLibItem>gphoto2_port</linkerLibLibItem>
+            <linkerLibLibItem>usb-1.0</linkerLibLibItem>
           </linkerLibItems>
           <commandLine>-pthread</commandLine>
         </linkerTool>
       </compileType>
-      <item path="main.c" ex="false" tool="0" flavor2="0">
+      <folder path="HeaderFiles">
+        <cTool>
+          <incDir>
+            <pElem>include</pElem>
+          </incDir>
+        </cTool>
+      </folder>
+      <item path="include/RaspiCameraDaemon.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="src/camera-utils.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="src/daemon.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="src/main.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="src/signal.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="src/usb_device.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="src/utils.c" ex="false" tool="0" flavor2="0">
       </item>
     </conf>
     <conf name="Release" type="1">
@@ -76,7 +106,19 @@
           <developmentMode>5</developmentMode>
         </asmTool>
       </compileType>
-      <item path="main.c" ex="false" tool="0" flavor2="0">
+      <item path="include/RaspiCameraDaemon.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="src/camera-utils.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="src/daemon.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="src/main.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="src/signal.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="src/usb_device.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="src/utils.c" ex="false" tool="0" flavor2="0">
       </item>
     </conf>
   </confs>
