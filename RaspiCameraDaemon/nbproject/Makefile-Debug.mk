@@ -38,6 +38,7 @@ OBJECTFILES= \
 	${OBJECTDIR}/src/camera-utils.o \
 	${OBJECTDIR}/src/config.o \
 	${OBJECTDIR}/src/daemon.o \
+	${OBJECTDIR}/src/logging.o \
 	${OBJECTDIR}/src/main.o \
 	${OBJECTDIR}/src/signal.o \
 	${OBJECTDIR}/src/usb_device.o \
@@ -82,6 +83,11 @@ ${OBJECTDIR}/src/daemon.o: src/daemon.c
 	${MKDIR} -p ${OBJECTDIR}/src
 	${RM} "$@.d"
 	$(COMPILE.c) -g -I/home/pi/arch/include -Iinclude -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/daemon.o src/daemon.c
+
+${OBJECTDIR}/src/logging.o: src/logging.c
+	${MKDIR} -p ${OBJECTDIR}/src
+	${RM} "$@.d"
+	$(COMPILE.c) -g -I/home/pi/arch/include -Iinclude -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/logging.o src/logging.c
 
 ${OBJECTDIR}/src/main.o: src/main.c
 	${MKDIR} -p ${OBJECTDIR}/src

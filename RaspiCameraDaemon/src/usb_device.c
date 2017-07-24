@@ -82,12 +82,12 @@ void *rcd_usb_device_connection_init(void *t) {
 
     rc = libusb_init(NULL);
     if (rc < 0) {
-        fprintf(stderr, "failed to initialise libusb: %s\n", libusb_error_name(rc));
+        perr("failed to initialise libusb: %s\n", libusb_error_name(rc));
         pthread_exit(NULL);
     }
 
     if (!libusb_has_capability(LIBUSB_CAP_HAS_HOTPLUG)) {
-        fprintf(stderr, "Hotplug capabilites are not supported on this platform\n");
+        perr("Hotplug capabilites are not supported on this platform\n");
         libusb_exit(NULL);
         pthread_exit(NULL);
     }
@@ -95,7 +95,7 @@ void *rcd_usb_device_connection_init(void *t) {
     rc = libusb_hotplug_register_callback(NULL, LIBUSB_HOTPLUG_EVENT_DEVICE_ARRIVED, 0, vendor_id,
             product_id, class_id, hotplug_callback, NULL, &hp[0]);
     if (LIBUSB_SUCCESS != rc) {
-        fprintf(stderr, "Error registering callback 0\n");
+        perr("Error registering callback 0\n");
         libusb_exit(NULL);
 
         pthread_exit(NULL);
@@ -106,16 +106,18 @@ void *rcd_usb_device_connection_init(void *t) {
     if (LIBUSB_SUCCESS != rc) {
         
         libusb_hotplug_deregister_callback(NULL, hp[0]);
-        fprintf(stderr, "Error registering callback 1\n");
+        perr("Error registering callback 1\n");
         libusb_exit(NULL);
         pthread_exit(NULL);
     }
 
+    pinfo("Usb detect thread has been created\n");
+    
     while (!rcd_exit) {
         rc = libusb_handle_events_timeout(NULL, &tm);
         
         if (rc < 0)
-            fprintf(stderr, "libusb_handle_events() failed: %s\n", libusb_error_name(rc));
+            perr("libusb_handle_events() failed: %s\n", libusb_error_name(rc));
     }
 
     libusb_hotplug_deregister_callback(NULL, hp[0]);

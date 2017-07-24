@@ -49,6 +49,8 @@
 
 #include <pthread.h>
 
+#include <syslog.h>
+
 #include <gphoto2/gphoto2.h>
 
 
@@ -57,22 +59,32 @@
 static GPPortInfoList *portinfolist = NULL;
 static CameraAbilitiesList *abilities = NULL;
 
-extern int rcd_exit;
-
 struct _ThreadData {
     Camera *camera;
     time_t timeout;
     CameraTimeoutFunc func;
 };
 
+struct _UsbThreadData {
+    pthread_t thread;
+    pthread_attr_t attr;
+    void *status;
+};
+
+typedef struct _UsbThreadData UsbThreadData;
+
 typedef struct _ThreadData ThreadData;
 
 struct _RcdRunConfig {
     const char *configfile;
     int daemonize;
+    UsbThreadData t_usb_detect;
 };
 
 typedef struct _RcdRunConfig RcdRunConfig;
+
+extern int rcd_exit;
+extern RcdRunConfig config;
 
 GPContext* create_context();
 
@@ -83,6 +95,11 @@ void rcd_sig_term(int signo);
 int rcd_daemon_init();
 void *rcd_usb_device_connection_init(void *t);
 void rcd_config_parse(const char *filename);
+
+void pinfo(char *s, ...);
+void pdebug(char *s, ...);
+void perr(char *s, ...);
+void pwarn(char *s, ...);
 
 #endif /* RASPICAMERADAEMON_H */
 
