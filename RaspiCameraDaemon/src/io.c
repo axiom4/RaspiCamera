@@ -40,7 +40,7 @@ static void rcd_readline_destructor(void *ptr) {
 
 static void rcd_readline_once(void) {
     if (pthread_key_create(&rl_key, rcd_readline_destructor)) {
-        rdc_perror("error in pthread_key_create");
+        rcd_perror("error in pthread_key_create");
         exit(errno);
     }
 
@@ -70,17 +70,17 @@ ssize_t rcd_readline(int fd, void *vptr, size_t maxlen) {
     rline *tsd;
 
     if (pthread_once(&rl_once, rcd_readline_once)) {
-        rdc_perror("error in pthread_once");
+        rcd_perror("error in pthread_once");
         exit(errno);
     }
 
     if ((tsd = pthread_getspecific(rl_key)) == NULL) {
         if (!(tsd = calloc(1, sizeof (rline)))) {
-            rdc_perror("readline calloc()"); /* init to 0 */
+            rcd_perror("readline calloc()"); /* init to 0 */
             exit(errno);
         }
         if (pthread_setspecific(rl_key, tsd)) {
-            rdc_perror("error in pthread_setspecific");
+            rcd_perror("error in pthread_setspecific");
             exit(errno);
         }
     }

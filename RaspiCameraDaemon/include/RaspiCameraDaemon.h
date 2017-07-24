@@ -50,7 +50,6 @@
 #define MAXFD 64
 #define MAXLINE 4096
 
-
 /* datatypes */
 struct _ThreadData {
     Camera *camera;
@@ -68,10 +67,22 @@ typedef struct _UsbThreadData UsbThreadData;
 
 typedef struct _ThreadData ThreadData;
 
+struct RcdDaemonConfig {
+    char *log_facility;
+};
+
+struct RcdCameraConfig {
+    int camera_timeout;
+};
+
 struct _RcdRunConfig {
     const char *configfile;
     const char *app_name;
     int daemonize;
+
+    struct RcdDaemonConfig rcd_config;
+    struct RcdCameraConfig camera_config;
+
     UsbThreadData t_usb_detect;
 };
 
@@ -100,18 +111,26 @@ int rcd_daemon_init();
 void *rcd_usb_device_connection_init(void *t);
 
 /* config.c */
-void rcd_config_parse(const char *filename);
+void rcd_config_parse(const char *filename, RcdRunConfig *config);
 
 /* logging.c */
 void pinfo(char *s, ...);
 void pdebug(char *s, ...);
 void perr(char *s, ...);
 void pwarn(char *s, ...);
-void rdc_perror(const char *str);
+void rcd_perror(const char *str);
 
 /* io.c */
 ssize_t rcd_readline(int fd, void *vptr, size_t maxlen);
 ssize_t rcd_writeline(int fd, const char *str);
+
+/* utils.c */
+char * rcdStringToLower(const char *string);
+char * rcdStringToUpper(const char *string);
+int rcdCompareString(const char *s1, const char *s2, long len);
+char *rcdStringCat(char *string1, char *string2);
+char * rcdTrim(char * string);
+void rcdChomp(char *str);
 
 #endif /* RASPICAMERADAEMON_H */
 

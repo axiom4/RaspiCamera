@@ -38,7 +38,7 @@ static int LIBUSB_CALL hotplug_callback(libusb_context *ctx, libusb_device *dev,
     }
 
     //printf ("Device attached: %04x:%04x\n", desc.idVendor, desc.idProduct);
-    pinfo("%04x:%04x (bus %d, device %d) - Device attached\n",
+    pinfo("USB %04x:%04x (bus %d, device %d) - Device attached\n",
             desc.idVendor, desc.idProduct,
             libusb_get_bus_number(dev), libusb_get_device_address(dev));
 
@@ -66,7 +66,7 @@ static int LIBUSB_CALL hotplug_callback_detach(libusb_context *ctx, libusb_devic
         perr("Error getting device descriptor\n");
     }
 
-    pinfo("%04x:%04x (bus %d, device %d) - Device detached\n",
+    pinfo("USB %04x:%04x (bus %d, device %d) - Device detached\n",
             desc.idVendor, desc.idProduct,
             libusb_get_bus_number(dev), libusb_get_device_address(dev));
 

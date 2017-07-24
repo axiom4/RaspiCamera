@@ -22,13 +22,6 @@
  * THE SOFTWARE.
  */
 
-/* 
- * File:   main.c
- * Author: Riccardo Giannetto <rgiannetto@gmail.com>
- *
- * Created on 16 luglio 2017, 19.00
- */
-
 #include <RaspiCameraDaemon.h>
 
 #include <getopt.h>
@@ -59,6 +52,8 @@ int main(int argc, char** argv) {
     config.configfile = NULL;
     config.daemonize = 0;
     config.app_name = basename(argv[0]);
+    config.rcd_config.log_facility = NULL;
+    config.camera_config.camera_timeout = 0;
 
     rcd_signal(SIGINT, &rcd_sig_term);
     rcd_signal(SIGTERM, &rcd_sig_term);
@@ -88,7 +83,10 @@ int main(int argc, char** argv) {
         rcd_usage(argc, argv);
     }
 
-    rcd_config_parse(config.configfile);
+    rcd_config_parse(config.configfile, &config);
+    
+    if(rcd_exit)
+        exit(-1);
 
     if (config.daemonize)
         rcd_daemon_init();
@@ -117,6 +115,11 @@ int main(int argc, char** argv) {
     pinfo("Main: completed join with Usb Detect Thread having a status of % ld\n",(long)config.t_usb_detect.status);
     
     closelog();
+    
+    if(config.rcd_config.log_facility) {
+        free(config.rcd_config.log_facility);
+        config.rcd_config.log_facility = NULL;
+    }
     
     pthread_exit(NULL);
 }

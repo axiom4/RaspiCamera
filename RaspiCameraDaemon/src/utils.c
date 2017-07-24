@@ -22,3 +22,108 @@
  * THE SOFTWARE.
  */
 
+#include <RaspiCameraDaemon.h>
+
+char * rcdStringToLower(const char *string) {
+    char *l_string;
+    char *ptr;
+    int len;
+
+    if (!string)
+        return NULL;
+    len = strlen(string) + 1;
+    if (!(l_string = malloc(len))) {
+        rcd_perror("strtolower malloc");
+        exit(errno);
+    }
+
+    bzero(l_string, len);
+    ptr = l_string;
+
+    while (*string) {
+        *ptr = tolower((int) *string++);
+        ptr++;
+    }
+
+    return l_string;
+}
+
+char * rcdStringToUpper(const char *string) {
+    char *u_string;
+    char *ptr;
+
+    if (!string)
+        return NULL;
+
+    if (!(u_string = malloc(strlen(string) + 1))) {
+        rcd_perror("strtolower malloc");
+        exit(errno);
+    }
+
+    ptr = u_string;
+
+    while (*string) {
+        *ptr = tolower((int) *string++);
+        ptr++;
+    }
+
+    ptr = '\0';
+
+    return u_string;
+}
+
+int rcdCompareString(const char *s1, const char *s2, long len) {
+    for (; (*s1 == *s2) && *s1 && len > 0; s1++, s2++, len--)
+        ;
+    return (len == 0 ? 0 : *s1 - *s2);
+}
+
+char *rcdStringCat(char *string1, char *string2) {
+    char *dest_str;
+
+    asprintf(&dest_str, "%s%s", string1, string2);
+
+    return dest_str;
+}
+
+char * rcdTrim(char * string) {
+    char *ptr = NULL;
+
+    if (!string)
+        return NULL;
+
+    ptr = string;
+
+    while (*ptr == ' ' || *ptr == '\t') {
+        ptr++;
+    }
+    string = ptr;
+
+    ptr = string + strlen(string) - 1;
+
+    while (*ptr == ' ' || *ptr == '\t') {
+        *ptr = '\0';
+        ptr--;
+    }
+
+    return string;
+
+}
+
+void rcdChomp(char *str) {
+	char *ptr;
+
+	if (!str)
+		return;
+
+	ptr = str;
+
+	while (*ptr) {
+		if (*ptr == '\n' || *ptr == '\r')
+			*ptr = '\0';
+
+		ptr++;
+	}
+
+	return;
+}

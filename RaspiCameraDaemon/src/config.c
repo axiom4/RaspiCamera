@@ -24,25 +24,209 @@
 
 #include <RaspiCameraDaemon.h>
 
-void rcd_config_parse(const char *filename) {
+struct token {
+    char *token;
+    char *nexttoken;
+};
+
+typedef enum {
+    UNKNOWN,
+    RCD,
+    CAMERA
+} rcd_section;
+
+char * rcdReadToken(const char *line, struct token *tk) {
+    int c = 0;
+    char *ptr = (char *) line;
+
+    tk->token = (char *) line;
+    tk->nexttoken = NULL;
+
+    if (!ptr)
+        return NULL;
+
+    while ((c = (int) *ptr)) {
+        if (c == ' ' || c == '\t') {
+            *ptr = '\0';
+            ptr++;
+
+            while (*ptr == ' ' || *ptr == '\t') {
+                *ptr = '\0';
+                ptr++;
+            }
+
+            if (*ptr == '\r')
+                tk->nexttoken = NULL;
+            else
+                tk->nexttoken = ptr;
+
+            break;
+        } else if (c == '\r' || c == '\n') {
+            *ptr = '\0';
+            tk->nexttoken = NULL;
+            break;
+        }
+        ptr++;
+    }
+
+    return tk->token;
+}
+
+int rcdParseToken(const char *cmd, const char *token) {
+    ssize_t len = 0;
+    char *str;
+
+    if (cmd && token) {
+        str = rcdStringToLower((char *) cmd);
+        len = strcmp(str, token);
+        free(str);
+    }
+
+    return (!len ? 1 : 0);
+}
+
+int rcdParseTokenSection(const char *cmd, const char *token) {
+    ssize_t len = 0;
+    char *str;
+
+    if (cmd && token) {
+        str = rcdStringToLower((char *) cmd);
+        len = rcdCompareString(str, token, strlen(token));
+        free(str);
+    }
+
+    return (!len ? 1 : 0);
+}
+
+void rcd_config_parse(const char *filename, RcdRunConfig *config) {
     int config_fd;
     struct stat sb;
+    char buffer[MAXLINE];
+
+    int ret;
+
+    char *ptr;
+    int line = 0;
+    rcd_section section = UNKNOWN;
+
+    int parse_error = 0;
+
+    struct token tk;
 
     if (stat(filename, &sb) == -1) {
-        rdc_perror("config file open");
+        rcd_perror("config file open");
         exit(errno);
     }
 
-    if(sb.st_mode & S_IFMT != S_IFREG) {
+    if (sb.st_mode & S_IFMT != S_IFREG) {
         perr("%s: is not regular file\n", filename);
         exit(EXIT_FAILURE);
     }
-    
+
     if ((config_fd = open(filename, 0, O_RDONLY)) < 0) {
-        rdc_perror("config file open");
+        rcd_perror("config file open");
         exit(errno);
     }
-    
-    if(config_fd)
+
+    bzero(buffer, MAXLINE);
+
+    while ((ret = rcd_readline(config_fd, buffer, MAXLINE)) > 0) {
+        rcdChomp(buffer);
+        rcdTrim(buffer);
+        line++;
+
+        tk.token = rcdReadToken(buffer, &tk);
+
+        if (rcdParseToken(tk.token, "") || tk.token[0] == '#' || tk.token[0] == ';') {
+            continue;
+        } else if (tk.token[0] == '[' && tk.token[strlen(tk.token) - 1] == ']') {
+
+            ptr = tk.token;
+
+            ptr++;
+            ptr[strlen(ptr) - 1] = 0;
+
+            if (!rcdParseTokenSection(ptr, "rcd")) {
+                section = RCD;
+            } else if (!rcdParseTokenSection(ptr, "camera")) {
+                section = CAMERA;
+            } else {
+                section = UNKNOWN;
+                perr("Invalid config file section: %s\n", ptr);
+                parse_error = 1;
+                break;
+            }
+        } else if (rcdParseToken(tk.token, "facility") && section == RCD) {
+            if (!(tk.token = rcdReadToken(tk.nexttoken, &tk))) {
+                perr("invalid line: %d\n", line);
+                parse_error = 1;
+                break;
+            }
+
+            if (rcdParseToken(tk.token, "=")) {
+
+                if (!(tk.token = rcdReadToken(tk.nexttoken, &tk)) && tk.nexttoken) {
+                    perr("invalid line: %d\n", line);
+                    parse_error = 1;
+                    break;
+                }
+
+                ret = strlen(tk.token);
+
+                if (!(config->rcd_config.log_facility = malloc(ret + 1))) {
+                    rcd_perror("malloc");
+                    parse_error = 1;
+                    break;
+                }
+                bzero(config->rcd_config.log_facility, ret + 1);
+                strncpy(config->rcd_config.log_facility, tk.token, ret);
+            }
+        } else if (rcdParseToken(tk.token, "timeout") && section == CAMERA) {
+            if (!(tk.token = rcdReadToken(tk.nexttoken, &tk))) {
+                perr("invalid line: %d\n", line);
+                parse_error = 1;
+                break;
+            }
+
+            if (rcdParseToken(tk.token, "=")) {
+
+                if (!(tk.token = rcdReadToken(tk.nexttoken, &tk)) && tk.nexttoken) {
+                    perr("invalid line: %d\n", line);
+
+                    parse_error = 1;
+
+                    break;
+                }
+
+                ret = strtol(tk.token, NULL, 10);
+
+                if (ret <= 0 || ret > 65535) {
+                    perr("invalid uid_length (line: %d)\n", line);
+                    parse_error = 1;
+                    break;
+                }
+
+                config->camera_config.camera_timeout = ret;
+            }
+        } else {
+            perr("Error: unknown keyword: %s at line: %d\n", tk.token, line);
+            parse_error = 1;
+
+            break;
+        }
+
+        bzero(buffer, MAXLINE);
+    }
+
+    if (parse_error) {
+        if (config->rcd_config.log_facility) {
+            free(config->rcd_config.log_facility);
+            config->rcd_config.log_facility = NULL;
+        }
+        
+        rcd_exit = 1;
+    }
+
+    if (config_fd)
         close(config_fd);
 }
