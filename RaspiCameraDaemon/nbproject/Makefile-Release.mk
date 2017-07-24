@@ -38,6 +38,7 @@ OBJECTFILES= \
 	${OBJECTDIR}/src/camera-utils.o \
 	${OBJECTDIR}/src/config.o \
 	${OBJECTDIR}/src/daemon.o \
+	${OBJECTDIR}/src/io.o \
 	${OBJECTDIR}/src/logging.o \
 	${OBJECTDIR}/src/main.o \
 	${OBJECTDIR}/src/signal.o \
@@ -83,6 +84,11 @@ ${OBJECTDIR}/src/daemon.o: src/daemon.c
 	${MKDIR} -p ${OBJECTDIR}/src
 	${RM} "$@.d"
 	$(COMPILE.c) -O2 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/daemon.o src/daemon.c
+
+${OBJECTDIR}/src/io.o: src/io.c
+	${MKDIR} -p ${OBJECTDIR}/src
+	${RM} "$@.d"
+	$(COMPILE.c) -O2 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/io.o src/io.c
 
 ${OBJECTDIR}/src/logging.o: src/logging.c
 	${MKDIR} -p ${OBJECTDIR}/src

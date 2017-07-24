@@ -22,13 +22,6 @@
  * THE SOFTWARE.
  */
 
-/* 
- * File:   RaspiCameraDaemon.h
- * Author: rgiannetto
- *
- * Created on 23 luglio 2017, 7.45
- */
-
 #ifndef RASPICAMERADAEMON_H
 #define RASPICAMERADAEMON_H
 
@@ -53,12 +46,12 @@
 
 #include <gphoto2/gphoto2.h>
 
-
+/* #define */
 #define MAXFD 64
+#define MAXLINE 4096
 
-static GPPortInfoList *portinfolist = NULL;
-static CameraAbilitiesList *abilities = NULL;
 
+/* datatypes */
 struct _ThreadData {
     Camera *camera;
     time_t timeout;
@@ -84,23 +77,41 @@ struct _RcdRunConfig {
 
 typedef struct _RcdRunConfig RcdRunConfig;
 
+
+/* global declare */
 extern int rcd_exit;
 extern RcdRunConfig config;
+static GPPortInfoList *portinfolist = NULL;
+static CameraAbilitiesList *abilities = NULL;
 
+
+/* camera-utils.c */
 GPContext* create_context();
 
+/* signal.c */
 void (*rcd_signal(int signo, void (*func)(int)))(int);
 void rcd_sig_pipe(int signo);
 void rcd_sig_term(int signo);
 
+/* daemon.c */
 int rcd_daemon_init();
+
+/* usb_device.c */
 void *rcd_usb_device_connection_init(void *t);
+
+/* config.c */
 void rcd_config_parse(const char *filename);
 
+/* logging.c */
 void pinfo(char *s, ...);
 void pdebug(char *s, ...);
 void perr(char *s, ...);
 void pwarn(char *s, ...);
+void rdc_perror(const char *str);
+
+/* io.c */
+ssize_t rcd_readline(int fd, void *vptr, size_t maxlen);
+ssize_t rcd_writeline(int fd, const char *str);
 
 #endif /* RASPICAMERADAEMON_H */
 
