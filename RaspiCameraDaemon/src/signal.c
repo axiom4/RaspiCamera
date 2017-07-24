@@ -50,7 +50,7 @@ void rcd_sig_pipe(int signo) {
 }
 
 void rcd_sig_term(int signo) {
-    if (signo == SIGINT) {
+    if (signo == SIGINT || signo == SIGTERM) {
         rcd_exit = 1;
     }
 }

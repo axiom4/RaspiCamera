@@ -34,6 +34,7 @@
 #include <getopt.h>
 
 int rcd_exit = 0;
+RcdRunConfig config;
 
 void rcd_usage(int argc, char**argv) {
     printf(
@@ -54,18 +55,16 @@ static struct option long_options[] = {
 int main(int argc, char** argv) {
     int c, ret;
     int option_index = 0;
-
-    void *status;
-
-    RcdRunConfig config;
-    pthread_t t_usb_detect;
-    pthread_attr_t attr;
-
+    
     config.configfile = NULL;
     config.daemonize = 0;
 
     rcd_signal(SIGINT, &rcd_sig_term);
+    rcd_signal(SIGTERM, &rcd_sig_term);
+    
     rcd_signal(SIGPIPE, &rcd_sig_pipe);
+    
+    openlog(basename(argv[0]), 0, LOG_DAEMON);
 
     while ((c = getopt_long(argc, argv, "c:Dh", long_options, &option_index)) != -1) {
         switch (c) {
@@ -84,13 +83,6 @@ int main(int argc, char** argv) {
         }
     }
 
-    if (optind < argc) {
-        printf("non-option ARGV-elements: ");
-        while (optind < argc)
-            printf("%s ", argv[optind++]);
-        printf("\n");
-    }
-
     if (!config.configfile) {
         rcd_usage(argc, argv);
     }
@@ -101,13 +93,13 @@ int main(int argc, char** argv) {
         rcd_daemon_init();
 
 
-    pthread_attr_init(&attr);
-    pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_JOINABLE);
+    pthread_attr_init(&config.t_usb_detect.attr);
+    pthread_attr_setdetachstate(&config.t_usb_detect.attr, PTHREAD_CREATE_JOINABLE);
 
-    ret = pthread_create(&t_usb_detect, &attr, rcd_usb_device_connection_init, NULL);
+    ret = pthread_create(&config.t_usb_detect.thread, &config.t_usb_detect.attr, rcd_usb_device_connection_init, NULL);
 
     if (ret) {
-        printf("ERROR; return code from pthread_create() is %d\n", ret);
+        perr("return code from pthread_create() is %d\n", ret);
         exit(-1);
     }
 
@@ -115,14 +107,16 @@ int main(int argc, char** argv) {
         pause();
     }
 
-    pthread_attr_destroy(&attr);
-    ret = pthread_join(t_usb_detect, &status);
+    pthread_attr_destroy(&config.t_usb_detect.attr);
+    ret = pthread_join(config.t_usb_detect.thread, &config.t_usb_detect.status);
     if (ret) {
-        printf("ERROR; return code from pthread_join() is %d\n", ret);
+        perr("return code from pthread_join() is %d\n", ret);
         exit(-1);
     }
-    printf("Main: completed join with thread having a status of % ld\n",(long)status);
-
+    pinfo("Main: completed join with Usb Detect Thread having a status of % ld\n",(long)config.t_usb_detect.status);
+    
+    closelog();
+    
     pthread_exit(NULL);
 }
 
