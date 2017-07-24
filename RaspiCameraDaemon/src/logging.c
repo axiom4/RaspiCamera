@@ -34,7 +34,7 @@ void pdebug(char *s, ...) {
 
     time(&rawtime);
     timeinfo = localtime(&rawtime);
-    strftime(buf, 1023, "%b %d %H:%M:%S proxymulticast: DEBUG - ", timeinfo);
+    strftime(buf, 1023, "%b %d %H:%M:%S", timeinfo);
 
     va_start(ap, s);
     vasprintf(&buf1, s, ap);
@@ -43,7 +43,7 @@ void pdebug(char *s, ...) {
     if (config.daemonize) {
         syslog(LOG_DEBUG, "%s", buf1);
     } else {
-        fprintf(stderr, "%s%s", buf, buf1);
+        fprintf(stderr, "%s %s: DEBUG - %s", buf, config.app_name, buf1);
     }
     
     free(buf1);
@@ -58,7 +58,7 @@ void pinfo(char *s, ...) {
 
     time(&rawtime);
     timeinfo = localtime(&rawtime);
-    strftime(buf, 1023, "%b %d %H:%M:%S proxymulticast: INFO - ", timeinfo);
+    strftime(buf, 1023, "%b %d %H:%M:%S", timeinfo);
 
     va_start(ap, s);
     vasprintf(&buf1, s, ap);
@@ -67,7 +67,7 @@ void pinfo(char *s, ...) {
     if (config.daemonize) {
         syslog(LOG_INFO, "%s", buf1);
     } else {
-        fprintf(stderr, "%s%s", buf, buf1);
+        fprintf(stderr, "%s %s: INFO - %s", buf, config.app_name, buf1);
     }
     
     free(buf1);
@@ -82,7 +82,7 @@ void perr(char *s, ...) {
 
     time(&rawtime);
     timeinfo = localtime(&rawtime);
-    strftime(buf, 1023, "%b %d %H:%M:%S proxymulticast: ERROR - ", timeinfo);
+    strftime(buf, 1023, "%b %d %H:%M:%S", timeinfo);
 
     va_start(ap, s);
     vasprintf(&buf1, s, ap);
@@ -91,7 +91,7 @@ void perr(char *s, ...) {
     if (config.daemonize) {
         syslog(LOG_ERR, "%s", buf1);
     } else {
-        fprintf(stderr, "%s%s", buf, buf1);
+        fprintf(stderr, "%s %s: ERROR - %s", buf, config.app_name, buf1);
     }
 
     free(buf1);
@@ -106,7 +106,7 @@ void pwarn(char *s, ...) {
 
     time(&rawtime);
     timeinfo = localtime(&rawtime);
-    strftime(buf, 1023, "%b %d %H:%M:%S proxymulticast: WARN - ", timeinfo);
+    strftime(buf, 1023, "%b %d %H:%M:%S", timeinfo);
 
     va_start(ap, s);
     vasprintf(&buf1, s, ap);
@@ -115,7 +115,7 @@ void pwarn(char *s, ...) {
     if (config.daemonize) {
         syslog(LOG_WARNING, "%s", buf1);
     } else {
-        fprintf(stderr, "%s%s", buf, buf1);
+        fprintf(stderr, "%s %s: WARN - %s", buf, config.app_name, buf1);
     }
 
     free(buf1);

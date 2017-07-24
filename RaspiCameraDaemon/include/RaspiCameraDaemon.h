@@ -77,6 +77,7 @@ typedef struct _ThreadData ThreadData;
 
 struct _RcdRunConfig {
     const char *configfile;
+    const char *app_name;
     int daemonize;
     UsbThreadData t_usb_detect;
 };

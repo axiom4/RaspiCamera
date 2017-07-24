@@ -34,11 +34,11 @@ static int LIBUSB_CALL hotplug_callback(libusb_context *ctx, libusb_device *dev,
 
     rc = libusb_get_device_descriptor(dev, &desc);
     if (LIBUSB_SUCCESS != rc) {
-        fprintf(stderr, "Error getting device descriptor\n");
+        perr("Error getting device descriptor\n");
     }
 
     //printf ("Device attached: %04x:%04x\n", desc.idVendor, desc.idProduct);
-    printf("%04x:%04x (bus %d, device %d)\n",
+    pinfo("%04x:%04x (bus %d, device %d) - Device attached\n",
             desc.idVendor, desc.idProduct,
             libusb_get_bus_number(dev), libusb_get_device_address(dev));
 
@@ -49,14 +49,24 @@ static int LIBUSB_CALL hotplug_callback(libusb_context *ctx, libusb_device *dev,
 
     rc = libusb_open(dev, &handle);
     if (LIBUSB_SUCCESS != rc) {
-        fprintf(stderr, "Error opening device\n");
+        perr("Error opening device\n");
     }
 
     return 0;
 }
 
 static int LIBUSB_CALL hotplug_callback_detach(libusb_context *ctx, libusb_device *dev, libusb_hotplug_event event, void *user_data) {
-    printf("Device detached\n");
+    struct libusb_device_descriptor desc;
+    int rc;
+
+    rc = libusb_get_device_descriptor(dev, &desc);
+    if (LIBUSB_SUCCESS != rc) {
+        perr("Error getting device descriptor\n");
+    }
+
+    pinfo("%04x:%04x (bus %d, device %d) - Device detached\n",
+            desc.idVendor, desc.idProduct,
+            libusb_get_bus_number(dev), libusb_get_device_address(dev));
 
     if (handle) {
         libusb_close(handle);
@@ -70,9 +80,9 @@ void *rcd_usb_device_connection_init(void *t) {
     libusb_hotplug_callback_handle hp[2];
     int product_id, vendor_id, class_id;
     int rc;
-    
+
     struct timeval tm;
-    
+
     tm.tv_sec = 1;
     tm.tv_usec = 0;
 
@@ -104,7 +114,7 @@ void *rcd_usb_device_connection_init(void *t) {
     rc = libusb_hotplug_register_callback(NULL, LIBUSB_HOTPLUG_EVENT_DEVICE_LEFT, 0, vendor_id,
             product_id, class_id, hotplug_callback_detach, NULL, &hp[1]);
     if (LIBUSB_SUCCESS != rc) {
-        
+
         libusb_hotplug_deregister_callback(NULL, hp[0]);
         perr("Error registering callback 1\n");
         libusb_exit(NULL);
@@ -112,10 +122,10 @@ void *rcd_usb_device_connection_init(void *t) {
     }
 
     pinfo("Usb detect thread has been created\n");
-    
+
     while (!rcd_exit) {
         rc = libusb_handle_events_timeout(NULL, &tm);
-        
+
         if (rc < 0)
             perr("libusb_handle_events() failed: %s\n", libusb_error_name(rc));
     }

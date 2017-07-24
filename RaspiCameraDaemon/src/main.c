@@ -41,7 +41,7 @@ void rcd_usage(int argc, char**argv) {
             "Usage: %s [OPTIONS]\n\n"
             "  -c [CONFIG], --config [CONFIG]\n\t\tSpecify config file [required]\n"
             "  -D, --daemon\n\t\tEnable process background\n"
-            "  -h, --help\n\t\tThis help\n", basename(argv[0]));
+            "  -h, --help\n\t\tThis help\n", config.app_name);
     exit(1);
 }
 
@@ -58,13 +58,14 @@ int main(int argc, char** argv) {
     
     config.configfile = NULL;
     config.daemonize = 0;
+    config.app_name = basename(argv[0]);
 
     rcd_signal(SIGINT, &rcd_sig_term);
     rcd_signal(SIGTERM, &rcd_sig_term);
     
     rcd_signal(SIGPIPE, &rcd_sig_pipe);
     
-    openlog(basename(argv[0]), 0, LOG_DAEMON);
+    openlog(config.app_name, 0, LOG_DAEMON);
 
     while ((c = getopt_long(argc, argv, "c:Dh", long_options, &option_index)) != -1) {
         switch (c) {
