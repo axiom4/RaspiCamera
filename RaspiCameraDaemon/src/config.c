@@ -146,9 +146,9 @@ void rcd_config_parse(const char *filename, RcdRunConfig *config) {
             ptr++;
             ptr[strlen(ptr) - 1] = 0;
 
-            if (!rcdParseTokenSection(ptr, "rcd")) {
+            if (rcdParseTokenSection(ptr, "rcd")) {
                 section = RCD;
-            } else if (!rcdParseTokenSection(ptr, "camera")) {
+            } else if (rcdParseTokenSection(ptr, "camera")) {
                 section = CAMERA;
             } else {
                 section = UNKNOWN;
