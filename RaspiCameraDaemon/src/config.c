@@ -29,17 +29,17 @@ void rcd_config_parse(const char *filename) {
     struct stat sb;
 
     if (stat(filename, &sb) == -1) {
-        perror("config file open");
+        rdc_perror("config file open");
         exit(errno);
     }
 
     if(sb.st_mode & S_IFMT != S_IFREG) {
-        fprintf(stderr, "%s: is not regular file\n", filename);
+        perr("%s: is not regular file\n", filename);
         exit(EXIT_FAILURE);
     }
     
     if ((config_fd = open(filename, 0, O_RDONLY)) < 0) {
-        perror("config file open");
+        rdc_perror("config file open");
         exit(errno);
     }
     

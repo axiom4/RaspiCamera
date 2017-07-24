@@ -120,3 +120,7 @@ void pwarn(char *s, ...) {
 
     free(buf1);
 }
+
+void rdc_perror(const char *str) {
+    perr("%s: %s\n", str, strerror(errno));
+}
