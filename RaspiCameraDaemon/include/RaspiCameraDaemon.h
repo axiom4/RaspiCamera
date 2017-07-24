@@ -75,6 +75,15 @@ struct RcdCameraConfig {
     int camera_timeout;
 };
 
+typedef struct camera_elem {
+    char *camera_port;
+    Camera *camera;
+    
+    struct camera_elem *next;
+} camera_elem; 
+
+typedef struct camera_elem * camera_list;
+
 struct _RcdRunConfig {
     const char *configfile;
     const char *app_name;
@@ -84,10 +93,11 @@ struct _RcdRunConfig {
     struct RcdCameraConfig camera_config;
 
     UsbThreadData t_usb_detect;
+    
+    camera_list *camera_list;
 };
 
 typedef struct _RcdRunConfig RcdRunConfig;
-
 
 /* global declare */
 extern int rcd_exit;
@@ -131,6 +141,12 @@ int rcdCompareString(const char *s1, const char *s2, long len);
 char *rcdStringCat(char *string1, char *string2);
 char * rcdTrim(char * string);
 void rcdChomp(char *str);
+
+/* camera-list.c */
+int add_new_camera(camera_list *list, Camera *camera);
+int delete_camera(camera_list *list, camera_elem *elem);
+void print_camera_list(camera_list *list);
+struct camera_elem *search_camera(camera_list *list, char *camera_port);
 
 #endif /* RASPICAMERADAEMON_H */
 

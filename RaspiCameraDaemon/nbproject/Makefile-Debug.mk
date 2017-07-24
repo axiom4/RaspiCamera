@@ -35,6 +35,7 @@ OBJECTDIR=${CND_BUILDDIR}/${CND_CONF}/${CND_PLATFORM}
 
 # Object Files
 OBJECTFILES= \
+	${OBJECTDIR}/src/camera-list.o \
 	${OBJECTDIR}/src/camera-utils.o \
 	${OBJECTDIR}/src/config.o \
 	${OBJECTDIR}/src/daemon.o \
@@ -69,6 +70,11 @@ LDLIBSOPTIONS=-L/home/pi/arch/lib -Wl,-rpath,'/home/pi/arch/lib' -lgphoto2 -lgph
 ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/raspicameradaemon: ${OBJECTFILES}
 	${MKDIR} -p ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}
 	gcc -o ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/raspicameradaemon ${OBJECTFILES} ${LDLIBSOPTIONS} -pthread
+
+${OBJECTDIR}/src/camera-list.o: src/camera-list.c
+	${MKDIR} -p ${OBJECTDIR}/src
+	${RM} "$@.d"
+	$(COMPILE.c) -g -I/home/pi/arch/include -Iinclude -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/camera-list.o src/camera-list.c
 
 ${OBJECTDIR}/src/camera-utils.o: src/camera-utils.c
 	${MKDIR} -p ${OBJECTDIR}/src
