@@ -107,7 +107,7 @@ denyinterfaces wlan0
 3. Installing dependencies
 
 ```
-# sudo apt-get install -y build-essential libltdl-dev libusb-dev libexif-dev libpopt-dev libudev-dev pkg-config git automake autoconf autopoint gettext libtool wget libgd-dev libxml2-dev libreadline-dev libcdk5-dev 
+# sudo apt-get install -y build-essential libltdl-dev libusb-1.0-0-dev libexif-dev libpopt-dev libudev-dev pkg-config git automake autoconf autopoint gettext libtool wget libgd-dev libxml2-dev libreadline-dev libcdk5-dev 
 ```
 
 4. Create arch binary home
