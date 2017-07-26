@@ -24,10 +24,10 @@
 
 #include <RaspiCameraDaemon.h>
 
-int add_new_camera(camera_list *list, Camera *camera) {
-    camera_elem *elem, *ptr;
+int add_new_camera(camera_list **list, RcdCameraObj *camera) {
+    camera_list_elem *elem, *ptr;
 
-    if (!(elem = malloc(sizeof (camera_elem)))) {
+    if (!(elem = malloc(sizeof (camera_list_elem)))) {
         rcd_perror("malloc");
 
         return -1;
@@ -51,20 +51,20 @@ int add_new_camera(camera_list *list, Camera *camera) {
     return 0;
 }
 
-void print_camera_list(camera_list *list) {
-    camera_elem *ptr = *list;
+void print_camera_list(camera_list **list) {
+    camera_list_elem *ptr = *list;
 
     while (ptr) {
-        printf("%s\n", ptr->camera_port);
+        pdebug("Camera list element: %s - %s", ptr->camera->camera_name, ptr->camera->camera_port);
         ptr = ptr->next;
     }
 }
 
-camera_elem *search_camera(camera_list *list, char *camera_port) {
-    camera_elem *ptr = *list;
+camera_list_elem *search_camera(camera_list **list, char *camera_port) {
+    camera_list_elem *ptr = *list;
 
     while (ptr) {
-        if (rcdCompareString(ptr->camera_port, camera_port, strlen(ptr->camera_port)))
+        if (!rcdCompareString(ptr->camera->camera_port, camera_port, strlen(ptr->camera->camera_port)))
             return ptr;
 
         ptr = ptr->next;
@@ -73,23 +73,24 @@ camera_elem *search_camera(camera_list *list, char *camera_port) {
     return NULL;
 }
 
-int delete_camera(camera_list *list, camera_elem *elem) {
-    camera_elem *ptr = *list;
-    camera_elem *prev = NULL;
+int delete_camera(camera_list **list, camera_list_elem *elem) {
+    camera_list_elem *ptr = *list;
+    camera_list_elem *prev = NULL;
 
     while (ptr && ptr != elem) {
         prev = ptr;
         ptr = ptr->next;
     }
     
-    if(ptr) {
-        printf("%p - %p (prev: %p)\n", ptr, elem, prev);
-        
+    if(ptr) {        
         if(!prev) {
             *list = ptr->next;
         } else {
             prev->next = ptr->next;
         }
+        
+        if(ptr->camera)
+            free(ptr->camera);
         
         free(ptr);
     }

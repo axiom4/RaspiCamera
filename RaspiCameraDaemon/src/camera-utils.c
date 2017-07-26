@@ -24,6 +24,10 @@
 
 #include <RaspiCameraDaemon.h>
 
+GPPortInfoList *portinfolist = NULL;
+CameraAbilitiesList *abilities = NULL;
+GPContext* context = NULL;
+
 static void ctx_error_func(GPContext *context, const char *str, void *data) {
     fprintf(stderr, "\n*** Contexterror ***              \n%s\n", str);
     fflush(stderr);
@@ -55,6 +59,10 @@ GPContext* create_context() {
     return context;
 }
 
+int rcd_autodetect(CameraList *list, GPContext *context) {
+    gp_list_reset(list);
+    return gp_camera_autodetect(list, context);
+}
 
 static void
 thread_cleanup_func(void *data) {
@@ -161,66 +169,108 @@ void folder_list_folders(Camera *camera, const char *folder, GPContext *context)
     gp_list_free(list);
 }
 
-/*
- * This function opens a camera depending on the specified model and port.
- */
-int open_camera(Camera ** camera, const char *model, const char *port, GPContext *context) {
-    int ret, m, p;
-    CameraAbilities a;
-    GPPortInfo pi;
+RcdCameraObj * newCamera(int idVendor, int productId, char *camera_port) {
+    int i, count;
+    RcdCameraObj *newCamera = NULL;
 
-    ret = gp_camera_new(camera);
-    if (ret < GP_OK) return ret;
+    CameraList *tmpCameraList = NULL;
+    GPContext *context = create_context();
+
+    const char *c_name = NULL;
+    const char *c_port = NULL;
+
+    if (gp_list_new(&tmpCameraList) == GP_OK) {
+        count = rcd_autodetect(tmpCameraList, context);
+
+        if (count > 0) {
+            for (i = 0; i < count; i++) {
+                gp_list_get_name(tmpCameraList, i, &c_name);
+                gp_list_get_value(tmpCameraList, i, &c_port);
+
+                if (!rcdCompareString(c_port, camera_port, strlen(c_port))) {
+                    pinfo("Found camera: %s (%s)", c_name, c_port);
+                    
+                    newCamera = malloc(sizeof(RcdCameraObj));
+                                        
+                    asprintf(&newCamera->camera_name, "%s", c_name);
+                    asprintf(&newCamera->camera_port, "%s", c_port);
+                                        
+                    break;
+                }
+            }
+        }
+    }
+
+    if (tmpCameraList)
+        gp_list_free(tmpCameraList);
+
+    if (context)
+        gp_context_unref(context);
+
+    return newCamera;
+}
+
+int init_gphoto_camera_list() {
+    int ret;
+
+    context = gp_context_new();
+
+    if (!portinfolist) {
+
+        ret = gp_port_info_list_new(&portinfolist);
+
+        if (ret < GP_OK)
+            return ret;
+
+        ret = gp_port_info_list_load(portinfolist);
+
+        if (ret < 0)
+            return ret;
+
+        ret = gp_port_info_list_count(portinfolist);
+
+        if (ret < 0)
+            return ret;
+
+        return GP_OK;
+    }
 
     if (!abilities) {
         /* Load all the camera drivers we have... */
         ret = gp_abilities_list_new(&abilities);
 
-        if (ret < GP_OK) return ret;
+        if (ret < GP_OK)
+            return ret;
 
         ret = gp_abilities_list_load(abilities, context);
 
-        if (ret < GP_OK) return ret;
+        if (ret < GP_OK)
+            return ret;
     }
 
-    /* First lookup the model / driver */
-    m = gp_abilities_list_lookup_model(abilities, model);
-    if (m < GP_OK) return ret;
-    ret = gp_abilities_list_get_abilities(abilities, m, &a);
-    if (ret < GP_OK) return ret;
-    ret = gp_camera_set_abilities(*camera, a);
-    if (ret < GP_OK) return ret;
+}
 
-    if (!portinfolist) {
-        /* Load all the port drivers we have... */
-        ret = gp_port_info_list_new(&portinfolist);
-        if (ret < GP_OK) return ret;
-        ret = gp_port_info_list_load(portinfolist);
-        if (ret < 0) return ret;
-        ret = gp_port_info_list_count(portinfolist);
-        if (ret < 0) return ret;
+void free_gphoto_camera_list() {
+    if (portinfolist)
+        gp_port_info_list_free(portinfolist);
+
+    if (abilities)
+        gp_abilities_list_free(abilities);
+
+    portinfolist = NULL;
+    abilities = NULL;
+
+    gp_context_unref(context);
+}
+
+void free_camera_list(camera_list **list) {
+    camera_list_elem *ptr = *list;
+    
+    while(ptr) {
+        free(ptr->camera->camera_name);
+        free(ptr->camera->camera_port);
+        
+        delete_camera(list, ptr);
+        ptr = *list;
     }
-
-    /* Then associate the camera with the specified port */
-    p = gp_port_info_list_lookup_path(portinfolist, port);
-    switch (p) {
-        case GP_ERROR_UNKNOWN_PORT:
-            fprintf(stderr, "The port you specified "
-                    "('%s') can not be found. Please "
-                    "specify one of the ports found by "
-                    "'gphoto2 --list-ports' and make "
-                    "sure the spelling is correct "
-                    "(i.e. with prefix 'serial:' or 'usb:').",
-                    port);
-            break;
-        default:
-            break;
-    }
-    if (p < GP_OK) return p;
-
-    ret = gp_port_info_list_get_info(portinfolist, p, &pi);
-    if (ret < GP_OK) return ret;
-    ret = gp_camera_set_port_info(*camera, pi);
-    if (ret < GP_OK) return ret;
-    return GP_OK;
 }

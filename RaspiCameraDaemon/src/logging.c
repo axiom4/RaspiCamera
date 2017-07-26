@@ -32,21 +32,23 @@ void pdebug(char *s, ...) {
     time_t rawtime;
     struct tm * timeinfo;
 
-    time(&rawtime);
-    timeinfo = localtime(&rawtime);
-    strftime(buf, 1023, "%b %d %H:%M:%S", timeinfo);
+    if (config.debug) {
+        time(&rawtime);
+        timeinfo = localtime(&rawtime);
+        strftime(buf, 1023, "%b %d %H:%M:%S", timeinfo);
 
-    va_start(ap, s);
-    vasprintf(&buf1, s, ap);
-    va_end(ap);
+        va_start(ap, s);
+        vasprintf(&buf1, s, ap);
+        va_end(ap);
 
-    if (config.daemonize) {
-        syslog(LOG_DEBUG, "%s", buf1);
-    } else {
-        fprintf(stderr, "%s %s: DEBUG - %s", buf, config.app_name, buf1);
+        if (config.daemonize) {
+            syslog(LOG_DEBUG, "%s", buf1);
+        } else {
+            fprintf(stderr, "%s %s: DEBUG - %s\n", buf, config.app_name, buf1);
+        }
+
+        free(buf1);
     }
-    
-    free(buf1);
 }
 
 void pinfo(char *s, ...) {
@@ -67,9 +69,9 @@ void pinfo(char *s, ...) {
     if (config.daemonize) {
         syslog(LOG_INFO, "%s", buf1);
     } else {
-        fprintf(stderr, "%s %s: INFO - %s", buf, config.app_name, buf1);
+        fprintf(stderr, "%s %s: INFO - %s\n", buf, config.app_name, buf1);
     }
-    
+
     free(buf1);
 }
 
@@ -91,7 +93,7 @@ void perr(char *s, ...) {
     if (config.daemonize) {
         syslog(LOG_ERR, "%s", buf1);
     } else {
-        fprintf(stderr, "%s %s: ERROR - %s", buf, config.app_name, buf1);
+        fprintf(stderr, "%s %s: ERROR - %s\n", buf, config.app_name, buf1);
     }
 
     free(buf1);
@@ -115,12 +117,12 @@ void pwarn(char *s, ...) {
     if (config.daemonize) {
         syslog(LOG_WARNING, "%s", buf1);
     } else {
-        fprintf(stderr, "%s %s: WARN - %s", buf, config.app_name, buf1);
+        fprintf(stderr, "%s %s: WARN - %s\n", buf, config.app_name, buf1);
     }
 
     free(buf1);
 }
 
 void rcd_perror(const char *str) {
-    perr("%s: %s\n", str, strerror(errno));
+    perr("%s: %s", str, strerror(errno));
 }

@@ -44,7 +44,7 @@ int rcd_daemon_init() {
     else if (pid)
         _exit(0); /* child 1 terminates */
 
-    pinfo("daemonize pid: %d\n", getpid());
+    pinfo("daemonize pid: %d", getpid());
     /* child 2 continues... */
 
     chdir("/"); /* change working directory */

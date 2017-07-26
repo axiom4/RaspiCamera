@@ -75,19 +75,25 @@ struct RcdCameraConfig {
     int camera_timeout;
 };
 
-typedef struct camera_elem {
-    char *camera_port;
+typedef struct camera_object {
     Camera *camera;
-    
-    struct camera_elem *next;
-} camera_elem; 
+    char *camera_port;
+    char *camera_name;
+} RcdCameraObj;
 
-typedef struct camera_elem * camera_list;
+typedef struct camera_list_elem {
+    RcdCameraObj *camera;
+    
+    struct camera_list_elem *next;
+} camera_list_elem; 
+
+typedef struct camera_list_elem camera_list;
 
 struct _RcdRunConfig {
     const char *configfile;
     const char *app_name;
     int daemonize;
+    int debug;
 
     struct RcdDaemonConfig rcd_config;
     struct RcdCameraConfig camera_config;
@@ -102,9 +108,6 @@ typedef struct _RcdRunConfig RcdRunConfig;
 /* global declare */
 extern int rcd_exit;
 extern RcdRunConfig config;
-static GPPortInfoList *portinfolist = NULL;
-static CameraAbilitiesList *abilities = NULL;
-
 
 /* camera-utils.c */
 GPContext* create_context();
@@ -143,10 +146,16 @@ char * rcdTrim(char * string);
 void rcdChomp(char *str);
 
 /* camera-list.c */
-int add_new_camera(camera_list *list, Camera *camera);
-int delete_camera(camera_list *list, camera_elem *elem);
-void print_camera_list(camera_list *list);
-struct camera_elem *search_camera(camera_list *list, char *camera_port);
+int add_new_camera(camera_list **list, RcdCameraObj *camera);
+int delete_camera(camera_list **list, camera_list_elem *elem);
+void print_camera_list(camera_list **list);
+struct camera_list_elem *search_camera(camera_list **list, char *camera_port);
+
+/* camera-utils.c */
+int init_gphoto_camera_list();
+void free_gphoto_camera_list();
+RcdCameraObj * newCamera(int idVendor, int productId, char *camera_port);
+void free_camera_list(camera_list **list);
 
 #endif /* RASPICAMERADAEMON_H */
 

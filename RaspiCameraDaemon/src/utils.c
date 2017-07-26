@@ -111,19 +111,19 @@ char * rcdTrim(char * string) {
 }
 
 void rcdChomp(char *str) {
-	char *ptr;
+    char *ptr;
 
-	if (!str)
-		return;
+    if (!str)
+        return;
 
-	ptr = str;
+    ptr = str;
 
-	while (*ptr) {
-		if (*ptr == '\n' || *ptr == '\r')
-			*ptr = '\0';
+    while (*ptr) {
+        if (*ptr == '\n' || *ptr == '\r')
+            *ptr = '\0';
 
-		ptr++;
-	}
+        ptr++;
+    }
 
-	return;
+    return;
 }

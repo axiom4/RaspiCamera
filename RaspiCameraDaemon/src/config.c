@@ -119,7 +119,7 @@ void rcd_config_parse(const char *filename, RcdRunConfig *config) {
     }
 
     if (sb.st_mode & S_IFMT != S_IFREG) {
-        perr("%s: is not regular file\n", filename);
+        perr("%s: is not regular file", filename);
         exit(EXIT_FAILURE);
     }
 
@@ -152,13 +152,13 @@ void rcd_config_parse(const char *filename, RcdRunConfig *config) {
                 section = CAMERA;
             } else {
                 section = UNKNOWN;
-                perr("Invalid config file section: %s\n", ptr);
+                perr("Invalid config file section: %s", ptr);
                 parse_error = 1;
                 break;
             }
         } else if (rcdParseToken(tk.token, "facility") && section == RCD) {
             if (!(tk.token = rcdReadToken(tk.nexttoken, &tk))) {
-                perr("invalid line: %d\n", line);
+                perr("invalid line: %d", line);
                 parse_error = 1;
                 break;
             }
@@ -166,7 +166,7 @@ void rcd_config_parse(const char *filename, RcdRunConfig *config) {
             if (rcdParseToken(tk.token, "=")) {
 
                 if (!(tk.token = rcdReadToken(tk.nexttoken, &tk)) && tk.nexttoken) {
-                    perr("invalid line: %d\n", line);
+                    perr("invalid line: %d", line);
                     parse_error = 1;
                     break;
                 }
@@ -183,7 +183,7 @@ void rcd_config_parse(const char *filename, RcdRunConfig *config) {
             }
         } else if (rcdParseToken(tk.token, "timeout") && section == CAMERA) {
             if (!(tk.token = rcdReadToken(tk.nexttoken, &tk))) {
-                perr("invalid line: %d\n", line);
+                perr("invalid line: %d", line);
                 parse_error = 1;
                 break;
             }
@@ -191,7 +191,7 @@ void rcd_config_parse(const char *filename, RcdRunConfig *config) {
             if (rcdParseToken(tk.token, "=")) {
 
                 if (!(tk.token = rcdReadToken(tk.nexttoken, &tk)) && tk.nexttoken) {
-                    perr("invalid line: %d\n", line);
+                    perr("invalid line: %d", line);
 
                     parse_error = 1;
 
@@ -201,7 +201,7 @@ void rcd_config_parse(const char *filename, RcdRunConfig *config) {
                 ret = strtol(tk.token, NULL, 10);
 
                 if (ret <= 0 || ret > 65535) {
-                    perr("invalid uid_length (line: %d)\n", line);
+                    perr("invalid uid_length (line: %d)", line);
                     parse_error = 1;
                     break;
                 }
@@ -209,7 +209,7 @@ void rcd_config_parse(const char *filename, RcdRunConfig *config) {
                 config->camera_config.camera_timeout = ret;
             }
         } else {
-            perr("Error: unknown keyword: %s at line: %d\n", tk.token, line);
+            perr("Error: unknown keyword: %s at line: %d", tk.token, line);
             parse_error = 1;
 
             break;
