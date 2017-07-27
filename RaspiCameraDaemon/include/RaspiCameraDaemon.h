@@ -146,14 +146,14 @@ char * rcdTrim(char * string);
 void rcdChomp(char *str);
 
 /* camera-list.c */
-int add_new_camera(camera_list **list, RcdCameraObj *camera);
-int delete_camera(camera_list **list, camera_list_elem *elem);
+int add_new_camera_list(camera_list **list, RcdCameraObj *camera);
+int delete_camera_list(camera_list **list, camera_list_elem *elem);
 void print_camera_list(camera_list **list);
-struct camera_list_elem *search_camera(camera_list **list, char *camera_port);
+struct camera_list_elem *search_camera_list(camera_list **list, char *camera_port);
 
 /* camera-utils.c */
-int init_gphoto_camera_list();
-void free_gphoto_camera_list();
+int init_gphoto();
+void free_gphoto();
 RcdCameraObj * newCamera(int idVendor, int productId, char *camera_port);
 void free_camera_list(camera_list **list);
 

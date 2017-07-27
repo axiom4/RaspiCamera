@@ -102,7 +102,7 @@ int main(int argc, char** argv) {
         rcd_daemon_init();
 
     pinfo("init camera module");
-    init_gphoto_camera_list();
+    init_gphoto();
 
     pthread_attr_init(&config.t_usb_detect.attr);
     pthread_attr_setdetachstate(&config.t_usb_detect.attr, PTHREAD_CREATE_JOINABLE);
@@ -134,7 +134,7 @@ int main(int argc, char** argv) {
         config.rcd_config.log_facility = NULL;
     }
     
-    free_gphoto_camera_list();
+    free_gphoto();
     
     pinfo("Free camera list memory");
     free_camera_list(&config.camera_list);

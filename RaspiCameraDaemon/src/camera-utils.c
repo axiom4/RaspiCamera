@@ -210,7 +210,7 @@ RcdCameraObj * newCamera(int idVendor, int productId, char *camera_port) {
     return newCamera;
 }
 
-int init_gphoto_camera_list() {
+int init_gphoto() {
     int ret;
 
     context = gp_context_new();
@@ -250,7 +250,7 @@ int init_gphoto_camera_list() {
 
 }
 
-void free_gphoto_camera_list() {
+void free_gphoto() {
     if (portinfolist)
         gp_port_info_list_free(portinfolist);
 
@@ -266,11 +266,10 @@ void free_gphoto_camera_list() {
 void free_camera_list(camera_list **list) {
     camera_list_elem *ptr = *list;
     
-    while(ptr) {
+    while(*list) {
         free(ptr->camera->camera_name);
         free(ptr->camera->camera_port);
         
-        delete_camera(list, ptr);
-        ptr = *list;
+        delete_camera_list(list, ptr);
     }
 }

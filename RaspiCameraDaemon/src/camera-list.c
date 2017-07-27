@@ -24,7 +24,7 @@
 
 #include <RaspiCameraDaemon.h>
 
-int add_new_camera(camera_list **list, RcdCameraObj *camera) {
+int add_new_camera_list(camera_list **list, RcdCameraObj *camera) {
     camera_list_elem *elem, *ptr;
 
     if (!(elem = malloc(sizeof (camera_list_elem)))) {
@@ -60,7 +60,7 @@ void print_camera_list(camera_list **list) {
     }
 }
 
-camera_list_elem *search_camera(camera_list **list, char *camera_port) {
+camera_list_elem *search_camera_list(camera_list **list, char *camera_port) {
     camera_list_elem *ptr = *list;
 
     while (ptr) {
@@ -73,7 +73,7 @@ camera_list_elem *search_camera(camera_list **list, char *camera_port) {
     return NULL;
 }
 
-int delete_camera(camera_list **list, camera_list_elem *elem) {
+int delete_camera_list(camera_list **list, camera_list_elem *elem) {
     camera_list_elem *ptr = *list;
     camera_list_elem *prev = NULL;
 

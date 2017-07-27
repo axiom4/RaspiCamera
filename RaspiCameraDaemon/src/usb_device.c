@@ -45,7 +45,7 @@ static void add_device(libusb_device *dev) {
     asprintf(&port, "usb:%03d,%03d", libusb_get_bus_number(dev), libusb_get_device_address(dev));
 
     if ((camera = newCamera(desc.idVendor, desc.idProduct, port)))
-        add_new_camera(&config.camera_list, camera);
+        add_new_camera_list(&config.camera_list, camera);
 
     print_camera_list(&config.camera_list);
 
@@ -70,12 +70,12 @@ static void delete_device(libusb_device *dev) {
 
     asprintf(&port, "usb:%03d,%03d", libusb_get_bus_number(dev), libusb_get_device_address(dev));
 
-    if ((camera = search_camera(&config.camera_list, port))) {
+    if ((camera = search_camera_list(&config.camera_list, port))) {
         pinfo("Remove Camera: %s (%s)", camera->camera->camera_name, camera->camera->camera_port);
         free(camera->camera->camera_name);
         free(camera->camera->camera_port);
         
-        delete_camera(&config.camera_list, camera);
+        delete_camera_list(&config.camera_list, camera);
     }
 
     print_camera_list(&config.camera_list);
