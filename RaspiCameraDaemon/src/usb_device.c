@@ -72,8 +72,8 @@ static void delete_device(libusb_device *dev) {
 
     if ((camera = search_camera_list(&config.camera_list, port))) {
         pinfo("Remove Camera: %s (%s)", camera->camera->camera_name, camera->camera->camera_port);
-        free(camera->camera->camera_name);
-        free(camera->camera->camera_port);
+       
+        freeCamera(camera->camera);
         
         delete_camera_list(&config.camera_list, camera);
     }

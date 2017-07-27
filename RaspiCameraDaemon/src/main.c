@@ -59,6 +59,10 @@ int main(int argc, char** argv) {
     config.rcd_config.log_facility = NULL;
     config.camera_config.camera_timeout = 0;
     config.camera_list = NULL;
+    
+    config.portinfolist = NULL;
+    config.abilities = NULL;
+    config.context = NULL;
 
     rcd_signal(SIGINT, &rcd_sig_term);
     rcd_signal(SIGTERM, &rcd_sig_term);
@@ -134,6 +138,7 @@ int main(int argc, char** argv) {
         config.rcd_config.log_facility = NULL;
     }
     
+    pinfo("free camera module");
     free_gphoto();
     
     pinfo("Free camera list memory");

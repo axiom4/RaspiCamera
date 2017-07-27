@@ -57,13 +57,16 @@ struct _ThreadData {
     CameraTimeoutFunc func;
 };
 
-struct _UsbThreadData {
+struct _RcdThreadData {
+    int thread_exit;
     pthread_t thread;
     pthread_attr_t attr;
     void *status;
+    
+    pthread_mutex_t mutex;
 };
 
-typedef struct _UsbThreadData UsbThreadData;
+typedef struct _RcdThreadData RcdThreadData;
 
 typedef struct _ThreadData ThreadData;
 
@@ -79,6 +82,10 @@ typedef struct camera_object {
     Camera *camera;
     char *camera_port;
     char *camera_name;
+    
+    GPContext *context;
+    
+    RcdThreadData t_camera_monitor;    
 } RcdCameraObj;
 
 typedef struct camera_list_elem {
@@ -98,9 +105,13 @@ struct _RcdRunConfig {
     struct RcdDaemonConfig rcd_config;
     struct RcdCameraConfig camera_config;
 
-    UsbThreadData t_usb_detect;
+    RcdThreadData t_usb_detect;
     
     camera_list *camera_list;
+    
+    GPPortInfoList *portinfolist;
+    CameraAbilitiesList *abilities;
+    GPContext* context;
 };
 
 typedef struct _RcdRunConfig RcdRunConfig;
@@ -155,6 +166,7 @@ struct camera_list_elem *search_camera_list(camera_list **list, char *camera_por
 int init_gphoto();
 void free_gphoto();
 RcdCameraObj * newCamera(int idVendor, int productId, char *camera_port);
+void freeCamera(RcdCameraObj *camera);
 void free_camera_list(camera_list **list);
 
 #endif /* RASPICAMERADAEMON_H */

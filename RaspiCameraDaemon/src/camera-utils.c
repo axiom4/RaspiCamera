@@ -24,10 +24,6 @@
 
 #include <RaspiCameraDaemon.h>
 
-GPPortInfoList *portinfolist = NULL;
-CameraAbilitiesList *abilities = NULL;
-GPContext* context = NULL;
-
 static void ctx_error_func(GPContext *context, const char *str, void *data) {
     fprintf(stderr, "\n*** Contexterror ***              \n%s\n", str);
     fflush(stderr);
@@ -169,18 +165,122 @@ void folder_list_folders(Camera *camera, const char *folder, GPContext *context)
     gp_list_free(list);
 }
 
-RcdCameraObj * newCamera(int idVendor, int productId, char *camera_port) {
+int open_camera(Camera **camera, const char *model, const char *port, GPContext *context) {
+    int ret, m, p;
+    CameraAbilities a;
+    GPPortInfo pi;
+
+    ret = gp_camera_new(camera);
+
+    if (ret < GP_OK)
+        return ret;
+
+    //    if (!config.abilities) {
+    //        /* Load all the camera drivers we have... */
+    //        ret = gp_abilities_list_new(&config.abilities);
+    //        if (ret < GP_OK)
+    //            return ret;
+    //        
+    //        ret = gp_abilities_list_load(config.abilities, context);
+    //        if (ret < GP_OK)
+    //            return ret;
+    //    }
+
+    /* First lookup the model / driver */
+    m = gp_abilities_list_lookup_model(config.abilities, model);
+    if (m < GP_OK)
+        return ret;
+
+    ret = gp_abilities_list_get_abilities(config.abilities, m, &a);
+    if (ret < GP_OK)
+        return ret;
+
+    ret = gp_camera_set_abilities(*camera, a);
+    if (ret < GP_OK)
+        return ret;
+
+    //    if (!config.portinfolist) {
+    //        /* Load all the port drivers we have... */
+    //        ret = gp_port_info_list_new(&config.portinfolist);
+    //        if (ret < GP_OK)
+    //            return ret;
+    //        
+    //        ret = gp_port_info_list_load(config.portinfolist);
+    //        if (ret < 0)
+    //            return ret;
+    //        
+    //        ret = gp_port_info_list_count(config.portinfolist);
+    //        if (ret < 0)
+    //            return ret;
+    //    }
+
+    /* Then associate the camera with the specified port */
+    p = gp_port_info_list_lookup_path(config.portinfolist, port);
+    switch (p) {
+        case GP_ERROR_UNKNOWN_PORT:
+            fprintf(stderr, "The port you specified "
+                    "('%s') can not be found. Please "
+                    "specify one of the ports found by "
+                    "'gphoto2 --list-ports' and make "
+                    "sure the spelling is correct "
+                    "(i.e. with prefix 'serial:' or 'usb:').",
+                    port);
+            break;
+        default:
+            break;
+    }
+    if (p < GP_OK)
+        return p;
+
+    ret = gp_port_info_list_get_info(config.portinfolist, p, &pi);
+    if (ret < GP_OK)
+        return ret;
+
+    ret = gp_camera_set_port_info(*camera, pi);
+    if (ret < GP_OK)
+        return ret;
+
+    return GP_OK;
+}
+
+void *rcd_camera_monitor_thread(void *t) {
+    RcdCameraObj *camera = (RcdCameraObj *) t;
+    CameraText text;
+    int ret;
+
+    pinfo("Running %s (%s) monitoring thread", camera->camera_name, camera->camera_port);
+
+    while (!camera->t_camera_monitor.thread_exit) {
+        pdebug("ping camera %s (%s)", camera->camera_name, camera->camera_port);
+        
+        pthread_mutex_lock(&camera->t_camera_monitor.mutex);
+        ret = gp_camera_get_summary(camera->camera, &text, camera->context);
+        pthread_mutex_unlock(&camera->t_camera_monitor.mutex);
+        
+        if (ret < GP_OK) {
+            perr("Camera failed retrieving summary. [%s (%s)]", camera->camera_name, camera->camera_port);
+            gp_camera_free(camera->camera);
+
+            camera->t_camera_monitor.thread_exit = 1;
+        }
+        sleep(config.camera_config.camera_timeout);
+    }
+
+    pthread_exit(NULL);
+}
+
+RcdCameraObj *newCamera(int idVendor, int productId, char *camera_port) {
     int i, count;
     RcdCameraObj *newCamera = NULL;
 
     CameraList *tmpCameraList = NULL;
-    GPContext *context = create_context();
+    //GPContext *context = create_context();
 
     const char *c_name = NULL;
     const char *c_port = NULL;
 
     if (gp_list_new(&tmpCameraList) == GP_OK) {
-        count = rcd_autodetect(tmpCameraList, context);
+        count = rcd_autodetect(tmpCameraList, config.context);
 
         if (count > 0) {
             for (i = 0; i < count; i++) {
@@ -189,12 +289,32 @@ RcdCameraObj * newCamera(int idVendor, int productId, char *camera_port) {
 
                 if (!rcdCompareString(c_port, camera_port, strlen(c_port))) {
                     pinfo("Found camera: %s (%s)", c_name, c_port);
-                    
-                    newCamera = malloc(sizeof(RcdCameraObj));
-                                        
-                    asprintf(&newCamera->camera_name, "%s", c_name);
-                    asprintf(&newCamera->camera_port, "%s", c_port);
-                                        
+
+                    newCamera = malloc(sizeof (RcdCameraObj));
+
+                    if (open_camera(&newCamera->camera, c_name, c_port, config.context) == GP_OK) {
+                        newCamera->context = create_context();
+                        
+                        asprintf(&newCamera->camera_name, "%s", c_name);
+                        asprintf(&newCamera->camera_port, "%s", c_port);
+
+                        newCamera->t_camera_monitor.thread_exit = 0;
+
+                        pthread_mutex_init(&newCamera->t_camera_monitor.mutex, NULL);
+
+                        pthread_attr_init(&newCamera->t_camera_monitor.attr);
+                        pthread_attr_setdetachstate(&newCamera->t_camera_monitor.attr, PTHREAD_CREATE_JOINABLE);
+
+                        int ret = pthread_create(&newCamera->t_camera_monitor.thread, &newCamera->t_camera_monitor.attr, rcd_camera_monitor_thread, newCamera);
+
+                        if (ret) {
+                            perr("return code from pthread_create() is %d", ret);
+                        }
+
+                    } else {
+                        perr("error add camera: %s", c_name);
+                    }
+
                     break;
                 }
             }
@@ -204,30 +324,51 @@ RcdCameraObj * newCamera(int idVendor, int productId, char *camera_port) {
     if (tmpCameraList)
         gp_list_free(tmpCameraList);
 
-    if (context)
-        gp_context_unref(context);
-
     return newCamera;
+}
+
+void freeCamera(RcdCameraObj *camera) {
+    int ret;
+    camera->t_camera_monitor.thread_exit = 1;
+
+    ret = pthread_join(camera->t_camera_monitor.thread, &camera->t_camera_monitor.status);
+    if (ret) {
+        perr("return code from pthread_join() is %d", ret);
+        exit(-1);
+    }
+    
+    pthread_attr_destroy(&camera->t_camera_monitor.attr);
+    pthread_mutex_destroy(&camera->t_camera_monitor.mutex);
+    
+    pinfo("camera %s (%s) monitoring thread destroyed", camera->camera_name, camera->camera_port);
+
+    gp_camera_exit(camera->camera, camera->context);
+
+    gp_camera_unref(camera->camera);
+    gp_context_unref(camera->context);
+
+    free(camera->camera_name);
+    free(camera->camera_port);
 }
 
 int init_gphoto() {
     int ret;
 
-    context = gp_context_new();
+    config.context = create_context();
 
-    if (!portinfolist) {
+    if (!config.portinfolist) {
 
-        ret = gp_port_info_list_new(&portinfolist);
+        ret = gp_port_info_list_new(&config.portinfolist);
 
         if (ret < GP_OK)
             return ret;
 
-        ret = gp_port_info_list_load(portinfolist);
+        ret = gp_port_info_list_load(config.portinfolist);
 
         if (ret < 0)
             return ret;
 
-        ret = gp_port_info_list_count(portinfolist);
+        ret = gp_port_info_list_count(config.portinfolist);
 
         if (ret < 0)
             return ret;
@@ -235,14 +376,14 @@ int init_gphoto() {
         return GP_OK;
     }
 
-    if (!abilities) {
+    if (!config.abilities) {
         /* Load all the camera drivers we have... */
-        ret = gp_abilities_list_new(&abilities);
+        ret = gp_abilities_list_new(&config.abilities);
 
         if (ret < GP_OK)
             return ret;
 
-        ret = gp_abilities_list_load(abilities, context);
+        ret = gp_abilities_list_load(config.abilities, config.context);
 
         if (ret < GP_OK)
             return ret;
@@ -251,25 +392,24 @@ int init_gphoto() {
 }
 
 void free_gphoto() {
-    if (portinfolist)
-        gp_port_info_list_free(portinfolist);
+    if (config.portinfolist)
+        gp_port_info_list_free(config.portinfolist);
 
-    if (abilities)
-        gp_abilities_list_free(abilities);
+    if (config.abilities)
+        gp_abilities_list_free(config.abilities);
 
-    portinfolist = NULL;
-    abilities = NULL;
+    config.portinfolist = NULL;
+    config.abilities = NULL;
 
-    gp_context_unref(context);
+    gp_context_unref(config.context);
 }
 
 void free_camera_list(camera_list **list) {
     camera_list_elem *ptr = *list;
-    
-    while(*list) {
-        free(ptr->camera->camera_name);
-        free(ptr->camera->camera_port);
-        
+
+    while (ptr) {
+        freeCamera(ptr->camera);
         delete_camera_list(list, ptr);
+        ptr = *list;
     }
 }
