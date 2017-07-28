@@ -361,11 +361,11 @@ void freeCamera(RcdCameraObj *camera) {
     free(camera->camera_port);
 }
 
-int init_gphoto() {
+int gphoto_init() {
     config.context = create_context();
 }
 
-void free_gphoto() {
+void gphoto_free() {
     gp_context_unref(config.context);
 }
 
