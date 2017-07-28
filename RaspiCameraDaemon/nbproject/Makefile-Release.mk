@@ -42,6 +42,7 @@ OBJECTFILES= \
 	${OBJECTDIR}/src/io.o \
 	${OBJECTDIR}/src/logging.o \
 	${OBJECTDIR}/src/main.o \
+	${OBJECTDIR}/src/rcd-controller.o \
 	${OBJECTDIR}/src/signal.o \
 	${OBJECTDIR}/src/usb_device.o \
 	${OBJECTDIR}/src/utils.o
@@ -105,6 +106,11 @@ ${OBJECTDIR}/src/main.o: src/main.c
 	${MKDIR} -p ${OBJECTDIR}/src
 	${RM} "$@.d"
 	$(COMPILE.c) -O2 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/main.o src/main.c
+
+${OBJECTDIR}/src/rcd-controller.o: src/rcd-controller.c
+	${MKDIR} -p ${OBJECTDIR}/src
+	${RM} "$@.d"
+	$(COMPILE.c) -O2 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/rcd-controller.o src/rcd-controller.c
 
 ${OBJECTDIR}/src/signal.o: src/signal.c
 	${MKDIR} -p ${OBJECTDIR}/src

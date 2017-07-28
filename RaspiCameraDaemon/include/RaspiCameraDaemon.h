@@ -34,6 +34,9 @@
 #include <errno.h>
 #include <ctype.h>
 
+#include <sys/socket.h>
+#include <sys/un.h>
+
 #include <unistd.h>
 
 #include <sys/types.h>
@@ -71,6 +74,7 @@ typedef struct _RcdThreadData RcdThreadData;
 typedef struct _ThreadData ThreadData;
 
 struct RcdDaemonConfig {
+    char *socket_controller_s;
     char *log_facility;
 };
 
@@ -109,6 +113,7 @@ struct _RcdRunConfig {
     
     camera_list *camera_list;
     
+    int controller_socket;
 
     GPContext* context;
 };
@@ -118,9 +123,6 @@ typedef struct _RcdRunConfig RcdRunConfig;
 /* global declare */
 extern int rcd_exit;
 extern RcdRunConfig config;
-
-/* camera-utils.c */
-GPContext* create_context();
 
 /* signal.c */
 void (*rcd_signal(int signo, void (*func)(int)))(int);
@@ -134,7 +136,9 @@ int rcd_daemon_init();
 void *rcd_usb_device_connection_init(void *t);
 
 /* config.c */
+void config_init(RcdRunConfig *config);
 void rcd_config_parse(const char *filename, RcdRunConfig *config);
+void config_free(RcdRunConfig *config);
 
 /* logging.c */
 void pinfo(char *s, ...);
@@ -162,11 +166,15 @@ void print_camera_list(camera_list **list);
 struct camera_list_elem *search_camera_list(camera_list **list, char *camera_port);
 
 /* camera-utils.c */
-int init_gphoto();
-void free_gphoto();
+GPContext* create_context();
+int gphoto_init();
+void gphoto_free();
 RcdCameraObj * newCamera(int idVendor, int productId, char *camera_port);
 void freeCamera(RcdCameraObj *camera);
 void free_camera_list(camera_list **list);
+
+/* rcd-controller */
+void controller_socket_init();
 
 #endif /* RASPICAMERADAEMON_H */
 

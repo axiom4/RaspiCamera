@@ -21,6 +21,7 @@
       <itemPath>src/io.c</itemPath>
       <itemPath>src/logging.c</itemPath>
       <itemPath>src/main.c</itemPath>
+      <itemPath>src/rcd-controller.c</itemPath>
       <itemPath>src/signal.c</itemPath>
       <itemPath>src/usb_device.c</itemPath>
       <itemPath>src/utils.c</itemPath>
@@ -94,6 +95,8 @@
       </item>
       <item path="src/main.c" ex="false" tool="0" flavor2="0">
       </item>
+      <item path="src/rcd-controller.c" ex="false" tool="0" flavor2="0">
+      </item>
       <item path="src/signal.c" ex="false" tool="0" flavor2="0">
       </item>
       <item path="src/usb_device.c" ex="false" tool="0" flavor2="0">
@@ -138,6 +141,8 @@
       <item path="src/logging.c" ex="false" tool="0" flavor2="0">
       </item>
       <item path="src/main.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="src/rcd-controller.c" ex="false" tool="0" flavor2="0">
       </item>
       <item path="src/signal.c" ex="false" tool="0" flavor2="0">
       </item>
