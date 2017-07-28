@@ -35,6 +35,19 @@ typedef enum {
     CAMERA
 } rcd_section;
 
+void config_init(RcdRunConfig *config) {
+    config->configfile = NULL;
+    config->debug = 0;
+    config->daemonize = 0;
+    config->app_name = NULL;
+    config->rcd_config.log_facility = NULL;
+    config->rcd_config.socket_controller_s = NULL;
+    config->camera_config.camera_timeout = 0;
+    config->camera_list = NULL;
+    config->controller_socket = 0;
+    config->context = NULL;
+}
+
 char * rcdReadToken(const char *line, struct token *tk) {
     int c = 0;
     char *ptr = (char *) line;
@@ -181,6 +194,31 @@ void rcd_config_parse(const char *filename, RcdRunConfig *config) {
                 bzero(config->rcd_config.log_facility, ret + 1);
                 strncpy(config->rcd_config.log_facility, tk.token, ret);
             }
+        } else if (rcdParseToken(tk.token, "controller_socket") && section == RCD) {
+            if (!(tk.token = rcdReadToken(tk.nexttoken, &tk))) {
+                perr("invalid line: %d", line);
+                parse_error = 1;
+                break;
+            }
+
+            if (rcdParseToken(tk.token, "=")) {
+
+                if (!(tk.token = rcdReadToken(tk.nexttoken, &tk)) && tk.nexttoken) {
+                    perr("invalid line: %d", line);
+                    parse_error = 1;
+                    break;
+                }
+
+                ret = strlen(tk.token);
+
+                if (!(config->rcd_config.socket_controller_s = malloc(ret + 1))) {
+                    rcd_perror("malloc");
+                    parse_error = 1;
+                    break;
+                }
+                bzero(config->rcd_config.socket_controller_s, ret + 1);
+                strncpy(config->rcd_config.socket_controller_s, tk.token, ret);
+            }
         } else if (rcdParseToken(tk.token, "timeout") && section == CAMERA) {
             if (!(tk.token = rcdReadToken(tk.nexttoken, &tk))) {
                 perr("invalid line: %d", line);
@@ -219,14 +257,23 @@ void rcd_config_parse(const char *filename, RcdRunConfig *config) {
     }
 
     if (parse_error) {
-        if (config->rcd_config.log_facility) {
-            free(config->rcd_config.log_facility);
-            config->rcd_config.log_facility = NULL;
-        }
+        config_free(config);
         
         rcd_exit = 1;
     }
 
     if (config_fd)
         close(config_fd);
+}
+
+void config_free(RcdRunConfig *config) {
+    if (config->rcd_config.log_facility) {
+        free(config->rcd_config.log_facility);
+        config->rcd_config.log_facility = NULL;
+    }
+    if (config->rcd_config.socket_controller_s) {
+        free(config->rcd_config.socket_controller_s);
+        config->rcd_config.socket_controller_s = NULL;
+    }
+
 }

@@ -52,15 +52,9 @@ int main(int argc, char** argv) {
     int c, ret;
     int option_index = 0;
 
-    config.configfile = NULL;
-    config.debug = 0;
-    config.daemonize = 0;
-    config.app_name = basename(argv[0]);
-    config.rcd_config.log_facility = NULL;
-    config.camera_config.camera_timeout = 0;
-    config.camera_list = NULL;
+    config_init(&config);
     
-    config.context = NULL;
+    config.app_name = basename(argv[0]);
 
     rcd_signal(SIGINT, &rcd_sig_term);
     rcd_signal(SIGTERM, &rcd_sig_term);
@@ -92,9 +86,9 @@ int main(int argc, char** argv) {
     if (!config.configfile) {
         rcd_usage(argc, argv);
     }
-    
+
     pinfo("Starting %s", config.app_name);
-    
+
     rcd_config_parse(config.configfile, &config);
 
     if (rcd_exit)
@@ -104,7 +98,7 @@ int main(int argc, char** argv) {
         rcd_daemon_init();
 
     pinfo("init camera module");
-    init_gphoto();
+    gphoto_init();
 
     pthread_attr_init(&config.t_usb_detect.attr);
     pthread_attr_setdetachstate(&config.t_usb_detect.attr, PTHREAD_CREATE_JOINABLE);
@@ -131,17 +125,15 @@ int main(int argc, char** argv) {
 
     closelog();
 
-    if (config.rcd_config.log_facility) {
-        free(config.rcd_config.log_facility);
-        config.rcd_config.log_facility = NULL;
-    }
-    
     pinfo("free camera module");
-    free_gphoto();
-    
+    gphoto_free();
+
     pinfo("Free camera list memory");
     free_camera_list(&config.camera_list);
-    
+
     pinfo("%s terminated!", config.app_name);
+
+    config_free(&config);
+
     pthread_exit(NULL);
 }
