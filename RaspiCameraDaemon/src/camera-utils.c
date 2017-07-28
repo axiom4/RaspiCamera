@@ -34,6 +34,11 @@ static void ctx_status_func(GPContext *context, const char *str, void *data) {
     fflush(stderr);
 }
 
+static void ctx_message_func(GPContext *context, const char *str, void *data) {
+    fprintf(stderr, "%s\n", str);
+    fflush(stderr);
+}
+
 GPContext* create_context() {
     GPContext *context;
 
@@ -43,10 +48,10 @@ GPContext* create_context() {
     /* All the parts below are optional! */
     gp_context_set_error_func(context, ctx_error_func, NULL);
     gp_context_set_status_func(context, ctx_status_func, NULL);
+    gp_context_set_message_func(context, ctx_message_func, NULL);
 
     /* also:
     gp_context_set_cancel_func    (p->context, ctx_cancel_func,  p);
-    gp_context_set_message_func   (p->context, ctx_message_func, p);
     if (isatty (STDOUT_FILENO))
             gp_context_set_progress_funcs (p->context,
                     ctx_progress_start_func, ctx_progress_update_func,
@@ -170,28 +175,30 @@ int open_camera(Camera **camera, const char *model, const char *port, GPContext 
     CameraAbilities a;
     GPPortInfo pi;
 
+    GPPortInfoList *portinfolist = NULL;
+    CameraAbilitiesList *abilities = NULL;
     ret = gp_camera_new(camera);
 
     if (ret < GP_OK)
         return ret;
 
-    //    if (!config.abilities) {
-    //        /* Load all the camera drivers we have... */
-    //        ret = gp_abilities_list_new(&config.abilities);
-    //        if (ret < GP_OK)
-    //            return ret;
-    //        
-    //        ret = gp_abilities_list_load(config.abilities, context);
-    //        if (ret < GP_OK)
-    //            return ret;
-    //    }
+    if (!abilities) {
+        /* Load all the camera drivers we have... */
+        ret = gp_abilities_list_new(&abilities);
+        if (ret < GP_OK)
+            return ret;
+
+        ret = gp_abilities_list_load(abilities, context);
+        if (ret < GP_OK)
+            return ret;
+    }
 
     /* First lookup the model / driver */
-    m = gp_abilities_list_lookup_model(config.abilities, model);
+    m = gp_abilities_list_lookup_model(abilities, model);
     if (m < GP_OK)
         return ret;
-
-    ret = gp_abilities_list_get_abilities(config.abilities, m, &a);
+    
+    ret = gp_abilities_list_get_abilities(abilities, m, &a);
     if (ret < GP_OK)
         return ret;
 
@@ -199,23 +206,23 @@ int open_camera(Camera **camera, const char *model, const char *port, GPContext 
     if (ret < GP_OK)
         return ret;
 
-    //    if (!config.portinfolist) {
-    //        /* Load all the port drivers we have... */
-    //        ret = gp_port_info_list_new(&config.portinfolist);
-    //        if (ret < GP_OK)
-    //            return ret;
-    //        
-    //        ret = gp_port_info_list_load(config.portinfolist);
-    //        if (ret < 0)
-    //            return ret;
-    //        
-    //        ret = gp_port_info_list_count(config.portinfolist);
-    //        if (ret < 0)
-    //            return ret;
-    //    }
+    if (!portinfolist) {
+        /* Load all the port drivers we have... */
+        ret = gp_port_info_list_new(&portinfolist);
+        if (ret < GP_OK)
+            return ret;
+
+        ret = gp_port_info_list_load(portinfolist);
+        if (ret < 0)
+            return ret;
+
+        ret = gp_port_info_list_count(portinfolist);
+        if (ret < 0)
+            return ret;
+    }
 
     /* Then associate the camera with the specified port */
-    p = gp_port_info_list_lookup_path(config.portinfolist, port);
+    p = gp_port_info_list_lookup_path(portinfolist, port);
     switch (p) {
         case GP_ERROR_UNKNOWN_PORT:
             fprintf(stderr, "The port you specified "
@@ -232,13 +239,16 @@ int open_camera(Camera **camera, const char *model, const char *port, GPContext 
     if (p < GP_OK)
         return p;
 
-    ret = gp_port_info_list_get_info(config.portinfolist, p, &pi);
+    ret = gp_port_info_list_get_info(portinfolist, p, &pi);
     if (ret < GP_OK)
         return ret;
 
     ret = gp_camera_set_port_info(*camera, pi);
     if (ret < GP_OK)
         return ret;
+
+    gp_abilities_list_free(abilities);
+    gp_port_info_list_free(portinfolist);
 
     return GP_OK;
 }
@@ -252,11 +262,11 @@ void *rcd_camera_monitor_thread(void *t) {
 
     while (!camera->t_camera_monitor.thread_exit) {
         pdebug("ping camera %s (%s)", camera->camera_name, camera->camera_port);
-        
+
         pthread_mutex_lock(&camera->t_camera_monitor.mutex);
         ret = gp_camera_get_summary(camera->camera, &text, camera->context);
         pthread_mutex_unlock(&camera->t_camera_monitor.mutex);
-        
+
         if (ret < GP_OK) {
             perr("Camera failed retrieving summary. [%s (%s)]", camera->camera_name, camera->camera_port);
             gp_camera_free(camera->camera);
@@ -294,7 +304,7 @@ RcdCameraObj *newCamera(int idVendor, int productId, char *camera_port) {
 
                     if (open_camera(&newCamera->camera, c_name, c_port, config.context) == GP_OK) {
                         newCamera->context = create_context();
-                        
+
                         asprintf(&newCamera->camera_name, "%s", c_name);
                         asprintf(&newCamera->camera_port, "%s", c_port);
 
@@ -336,10 +346,10 @@ void freeCamera(RcdCameraObj *camera) {
         perr("return code from pthread_join() is %d", ret);
         exit(-1);
     }
-    
+
     pthread_attr_destroy(&camera->t_camera_monitor.attr);
     pthread_mutex_destroy(&camera->t_camera_monitor.mutex);
-    
+
     pinfo("camera %s (%s) monitoring thread destroyed", camera->camera_name, camera->camera_port);
 
     gp_camera_exit(camera->camera, camera->context);
@@ -352,55 +362,10 @@ void freeCamera(RcdCameraObj *camera) {
 }
 
 int init_gphoto() {
-    int ret;
-
     config.context = create_context();
-
-    if (!config.portinfolist) {
-
-        ret = gp_port_info_list_new(&config.portinfolist);
-
-        if (ret < GP_OK)
-            return ret;
-
-        ret = gp_port_info_list_load(config.portinfolist);
-
-        if (ret < 0)
-            return ret;
-
-        ret = gp_port_info_list_count(config.portinfolist);
-
-        if (ret < 0)
-            return ret;
-
-        return GP_OK;
-    }
-
-    if (!config.abilities) {
-        /* Load all the camera drivers we have... */
-        ret = gp_abilities_list_new(&config.abilities);
-
-        if (ret < GP_OK)
-            return ret;
-
-        ret = gp_abilities_list_load(config.abilities, config.context);
-
-        if (ret < GP_OK)
-            return ret;
-    }
-
 }
 
 void free_gphoto() {
-    if (config.portinfolist)
-        gp_port_info_list_free(config.portinfolist);
-
-    if (config.abilities)
-        gp_abilities_list_free(config.abilities);
-
-    config.portinfolist = NULL;
-    config.abilities = NULL;
-
     gp_context_unref(config.context);
 }
 

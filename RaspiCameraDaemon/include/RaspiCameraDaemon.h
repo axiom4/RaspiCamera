@@ -109,8 +109,7 @@ struct _RcdRunConfig {
     
     camera_list *camera_list;
     
-    GPPortInfoList *portinfolist;
-    CameraAbilitiesList *abilities;
+
     GPContext* context;
 };
 

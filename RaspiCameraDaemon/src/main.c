@@ -60,8 +60,6 @@ int main(int argc, char** argv) {
     config.camera_config.camera_timeout = 0;
     config.camera_list = NULL;
     
-    config.portinfolist = NULL;
-    config.abilities = NULL;
     config.context = NULL;
 
     rcd_signal(SIGINT, &rcd_sig_term);
