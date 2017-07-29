@@ -53,7 +53,7 @@ int main(int argc, char** argv) {
     int option_index = 0;
 
     config_init(&config);
-    
+
     config.app_name = basename(argv[0]);
 
     rcd_signal(SIGINT, &rcd_sig_term);
@@ -97,6 +97,9 @@ int main(int argc, char** argv) {
     if (config.daemonize)
         rcd_daemon_init();
 
+    pinfo("controller initialization");
+    controller_socket_init();
+
     pinfo("init camera module");
     gphoto_init();
 
@@ -112,8 +115,11 @@ int main(int argc, char** argv) {
 
 
     while (!rcd_exit) {
-        pause();
+        controller_accept();
     }
+
+    pinfo("closing controller");
+    controller_socket_free();
 
     pthread_attr_destroy(&config.t_usb_detect.attr);
     ret = pthread_join(config.t_usb_detect.thread, &config.t_usb_detect.status);

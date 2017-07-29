@@ -155,3 +155,24 @@ ssize_t rcd_writeline(int fd, const char *str) {
 
     return -1;
 }
+
+int rcdAccept(int sockfd, struct sockaddr *addr, socklen_t *addrlen) {
+    int confd;
+
+again:
+    if ((confd = accept(sockfd, addr, addrlen)) < 0) {
+
+#ifdef  EPROTO
+        if (errno == EPROTO || errno == ECONNABORTED)
+            goto again;
+#else
+        if (errno == ECONNABORTED)
+            goto again;
+#endif
+
+        if (errno == EINTR) {
+            goto again;
+        }
+    }
+    return confd;
+}

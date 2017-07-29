@@ -150,6 +150,8 @@ void rcd_perror(const char *str);
 /* io.c */
 ssize_t rcd_readline(int fd, void *vptr, size_t maxlen);
 ssize_t rcd_writeline(int fd, const char *str);
+int rcdAccept(int sockfd, struct sockaddr *addr, socklen_t *addrlen);
+ssize_t rcd_read_n_bytes(int fd, void *vptr, size_t n);
 
 /* utils.c */
 char * rcdStringToLower(const char *string);
@@ -175,6 +177,8 @@ void free_camera_list(camera_list **list);
 
 /* rcd-controller */
 void controller_socket_init();
+void controller_accept();
+void controller_socket_free();
 
 #endif /* RASPICAMERADAEMON_H */
 

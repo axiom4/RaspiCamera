@@ -42,7 +42,7 @@ void controller_socket_init() {
     name.sun_family = AF_UNIX;
     strncpy(name.sun_path, config.rcd_config.socket_controller_s, sizeof (name.sun_path) - 1);
 
-    ret = bind(config.controller_socket, (const struct sockaddr *) &name, sizeof (struct sockaddr_un));
+    ret = bind(config.controller_socket, (const struct sockaddr_un *) &name, sizeof (struct sockaddr_un));
     if (ret < 0) {
         rcd_perror("controller socket bind");
         exit(EXIT_FAILURE);
@@ -54,4 +54,34 @@ void controller_socket_init() {
         exit(EXIT_FAILURE);
     }
 
+}
+
+void controller_accept() {
+    int data_socket;
+    int result;
+    char buffer[4096];
+    /* Wait for incoming connection. */
+
+    data_socket = rcdAccept(config.controller_socket, NULL, NULL);
+    if (data_socket < 0) {
+        rcd_perror("accept");
+        return;
+    }
+
+    while (1) {
+        result = read(data_socket, buffer, 4096);
+
+        if (result > 0)
+            pinfo("%s", buffer);
+        else if (result == 0) {
+            close(data_socket);
+            break;
+        }
+    }
+}
+
+void controller_socket_free() {
+    if (config.controller_socket > 0) {
+        close(config.controller_socket);
+    }
 }
