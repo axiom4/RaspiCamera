@@ -369,8 +369,13 @@ void gphotoFree() {
     gp_context_unref(config.context);
 }
 
+<<<<<<< HEAD
 void freeCameraList(RcdCameraList **list) {
     RcdCameraListElem *ptr = *list;
+=======
+void freeCameraList(CameraList **list) {
+    CameraListElem *ptr = *list;
+>>>>>>> ca61faa583a9f4677977a90d6a36d6b63efa9210
 
     while (ptr) {
         freeCamera(ptr->camera);
