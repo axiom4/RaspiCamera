@@ -93,6 +93,7 @@ typedef struct CameraObject {
 } RcdCameraObj;
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 typedef struct RcdCameraListElem {
     RcdCameraObj *camera;
     
@@ -100,6 +101,15 @@ typedef struct RcdCameraListElem {
 } RcdCameraListElem; 
 
 typedef struct RcdCameraListElem RcdCameraList;
+=======
+typedef struct CameraListElem {
+    RcdCameraObj *camera;
+    
+    struct CameraListElem *next;
+} CameraListElem; 
+
+typedef struct CameraListElem CameraList;
+>>>>>>> ca61faa583a9f4677977a90d6a36d6b63efa9210
 =======
 typedef struct CameraListElem {
     RcdCameraObj *camera;
@@ -122,7 +132,11 @@ struct _RcdRunConfig {
     RcdThreadData t_usb_detect;
     
 <<<<<<< HEAD
+<<<<<<< HEAD
     RcdCameraList *camera_list;
+=======
+    CameraList *camera_list;
+>>>>>>> ca61faa583a9f4677977a90d6a36d6b63efa9210
 =======
     CameraList *camera_list;
 >>>>>>> ca61faa583a9f4677977a90d6a36d6b63efa9210
@@ -178,15 +192,21 @@ void rcdChomp(char *str);
 
 /* camera-list.c */
 <<<<<<< HEAD
+<<<<<<< HEAD
 int addNewCameraList(RcdCameraList **list, RcdCameraObj *camera);
 int deleteCameraList(RcdCameraList **list, RcdCameraListElem *elem);
 void printCameraList(RcdCameraList **list);
 struct RcdCameraListElem *searchCameraList(RcdCameraList **list, char *camera_port);
 =======
+=======
+>>>>>>> ca61faa583a9f4677977a90d6a36d6b63efa9210
 int addNewCameraList(CameraList **list, RcdCameraObj *camera);
 int deleteCameraList(CameraList **list, CameraListElem *elem);
 void printCameraList(CameraList **list);
 struct CameraListElem *searchCameraList(CameraList **list, char *camera_port);
+<<<<<<< HEAD
+>>>>>>> ca61faa583a9f4677977a90d6a36d6b63efa9210
+=======
 >>>>>>> ca61faa583a9f4677977a90d6a36d6b63efa9210
 
 /* camera-utils.c */
@@ -196,7 +216,11 @@ void gphotoFree();
 RcdCameraObj * newCamera(int idVendor, int productId, char *camera_port);
 void freeCamera(RcdCameraObj *camera);
 <<<<<<< HEAD
+<<<<<<< HEAD
 void freeCameraList(RcdCameraList **list);
+=======
+void freeCameraList(CameraList **list);
+>>>>>>> ca61faa583a9f4677977a90d6a36d6b63efa9210
 =======
 void freeCameraList(CameraList **list);
 >>>>>>> ca61faa583a9f4677977a90d6a36d6b63efa9210

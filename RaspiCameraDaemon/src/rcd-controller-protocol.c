@@ -23,10 +23,13 @@
  */
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 #include <RaspiCameraDaemon.h>
 
 void rcdControllerProtocol(char *buf, size_t b_len) {
     
 }
+=======
+>>>>>>> ca61faa583a9f4677977a90d6a36d6b63efa9210
 =======
 >>>>>>> ca61faa583a9f4677977a90d6a36d6b63efa9210

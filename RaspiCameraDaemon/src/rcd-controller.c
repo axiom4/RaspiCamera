@@ -70,7 +70,11 @@ void controllerAccept() {
 
     while (1) {
 <<<<<<< HEAD
+<<<<<<< HEAD
         result = rcdReadline(data_socket, buffer, 4096);
+=======
+        result = rcdRead(data_socket, buffer, 4096);
+>>>>>>> ca61faa583a9f4677977a90d6a36d6b63efa9210
 =======
         result = rcdRead(data_socket, buffer, 4096);
 >>>>>>> ca61faa583a9f4677977a90d6a36d6b63efa9210

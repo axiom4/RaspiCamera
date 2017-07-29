@@ -25,10 +25,17 @@
 #include <RaspiCameraDaemon.h>
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 int addNewCameraList(RcdCameraList **list, RcdCameraObj *camera) {
     RcdCameraListElem *elem, *ptr;
 
     if (!(elem = malloc(sizeof (RcdCameraListElem)))) {
+=======
+int addNewCameraList(CameraList **list, RcdCameraObj *camera) {
+    CameraListElem *elem, *ptr;
+
+    if (!(elem = malloc(sizeof (CameraListElem)))) {
+>>>>>>> ca61faa583a9f4677977a90d6a36d6b63efa9210
 =======
 int addNewCameraList(CameraList **list, RcdCameraObj *camera) {
     CameraListElem *elem, *ptr;
@@ -59,8 +66,13 @@ int addNewCameraList(CameraList **list, RcdCameraObj *camera) {
 }
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 void printCameraList(RcdCameraList **list) {
     RcdCameraListElem *ptr = *list;
+=======
+void printCameraList(CameraList **list) {
+    CameraListElem *ptr = *list;
+>>>>>>> ca61faa583a9f4677977a90d6a36d6b63efa9210
 =======
 void printCameraList(CameraList **list) {
     CameraListElem *ptr = *list;
@@ -73,8 +85,13 @@ void printCameraList(CameraList **list) {
 }
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 RcdCameraListElem *searchCameraList(RcdCameraList **list, char *camera_port) {
     RcdCameraListElem *ptr = *list;
+=======
+CameraListElem *searchCameraList(CameraList **list, char *camera_port) {
+    CameraListElem *ptr = *list;
+>>>>>>> ca61faa583a9f4677977a90d6a36d6b63efa9210
 =======
 CameraListElem *searchCameraList(CameraList **list, char *camera_port) {
     CameraListElem *ptr = *list;
@@ -91,9 +108,15 @@ CameraListElem *searchCameraList(CameraList **list, char *camera_port) {
 }
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 int deleteCameraList(RcdCameraList **list, RcdCameraListElem *elem) {
     RcdCameraListElem *ptr = *list;
     RcdCameraListElem *prev = NULL;
+=======
+int deleteCameraList(CameraList **list, CameraListElem *elem) {
+    CameraListElem *ptr = *list;
+    CameraListElem *prev = NULL;
+>>>>>>> ca61faa583a9f4677977a90d6a36d6b63efa9210
 =======
 int deleteCameraList(CameraList **list, CameraListElem *elem) {
     CameraListElem *ptr = *list;
