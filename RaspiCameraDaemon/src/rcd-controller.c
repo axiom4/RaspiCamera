@@ -55,3 +55,33 @@ void controller_socket_init() {
     }
 
 }
+
+void controller_accept() {
+    int data_socket;
+    int result;
+    char buffer[4096];
+    /* Wait for incoming connection. */
+
+    data_socket = rcdAccept(config.controller_socket, NULL, NULL);
+    if (data_socket < 0) {
+        rcd_perror("accept");
+        return;
+    }
+
+    while (1) {
+        result = read(data_socket, buffer, 4096);
+
+        if (result > 0)
+            pinfo("%s", buffer);
+        else if (result == 0) {
+            close(data_socket);
+            break;
+        }
+    }
+}
+
+void controller_socket_free() {
+    if (config.controller_socket > 0) {
+        close(config.controller_socket);
+    }
+}
