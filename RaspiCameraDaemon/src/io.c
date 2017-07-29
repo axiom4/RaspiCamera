@@ -34,12 +34,12 @@ typedef struct {
     char rl_buf[MAXLINE];
 } rline;
 
-static void rcd_readline_destructor(void *ptr) {
+static void rcdReadlineDestructor(void *ptr) {
     free(ptr);
 }
 
-static void rcd_readline_once(void) {
-    if (pthread_key_create(&rl_key, rcd_readline_destructor)) {
+static void rcdReadlineOnce(void) {
+    if (pthread_key_create(&rl_key, rcdReadlineDestructor)) {
         rcd_perror("error in pthread_key_create");
         exit(errno);
     }
@@ -47,7 +47,7 @@ static void rcd_readline_once(void) {
     return;
 }
 
-static ssize_t rcd_read(rline *tsd, int fd, char *ptr) {
+static ssize_t rcdReadRline(rline *tsd, int fd, char *ptr) {
     if (tsd->rl_cnt <= 0) {
 again:
         if ((tsd->rl_cnt = read(fd, tsd->rl_buf, MAXLINE)) < 0) {
@@ -69,7 +69,7 @@ ssize_t rcdReadline(int fd, void *vptr, size_t maxlen) {
     char c, *ptr;
     rline *tsd;
 
-    if (pthread_once(&rl_once, rcd_readline_once)) {
+    if (pthread_once(&rl_once, rcdReadlineOnce)) {
         rcd_perror("error in pthread_once");
         exit(errno);
     }
@@ -87,7 +87,7 @@ ssize_t rcdReadline(int fd, void *vptr, size_t maxlen) {
 
     ptr = vptr;
     for (n = 1; n < maxlen; n++) {
-        if ((rc = rcd_read(tsd, fd, &c)) == 1) {
+        if ((rc = rcdReadRline(tsd, fd, &c)) == 1) {
             *ptr++ = c;
             if (c == '\n')
                 break;
@@ -126,7 +126,7 @@ ssize_t rcdReadNBytes(int fd, void *vptr, size_t n) {
 }
 
 /* socket send */
-ssize_t rcd_write_n_bytes(int fd, void *vptr, size_t n) {
+ssize_t rcdWriteNBytes(int fd, void *vptr, size_t n) {
     size_t nleft;
     ssize_t nwrite;
     char *ptr;
