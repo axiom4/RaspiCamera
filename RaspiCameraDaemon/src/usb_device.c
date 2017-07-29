@@ -54,15 +54,7 @@ static void add_device(libusb_device *dev) {
 
 static void delete_device(libusb_device *dev) {
     char *port;
-<<<<<<< HEAD
-<<<<<<< HEAD
     struct RcdCameraListElem *camera;
-=======
-    struct CameraListElem *camera;
->>>>>>> ca61faa583a9f4677977a90d6a36d6b63efa9210
-=======
-    struct CameraListElem *camera;
->>>>>>> ca61faa583a9f4677977a90d6a36d6b63efa9210
     struct libusb_device_descriptor desc;
     int r = libusb_get_device_descriptor(dev, &desc);
 

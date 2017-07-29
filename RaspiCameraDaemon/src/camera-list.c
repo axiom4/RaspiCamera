@@ -24,24 +24,11 @@
 
 #include <RaspiCameraDaemon.h>
 
-<<<<<<< HEAD
-<<<<<<< HEAD
+
 int addNewCameraList(RcdCameraList **list, RcdCameraObj *camera) {
     RcdCameraListElem *elem, *ptr;
 
     if (!(elem = malloc(sizeof (RcdCameraListElem)))) {
-=======
-int addNewCameraList(CameraList **list, RcdCameraObj *camera) {
-    CameraListElem *elem, *ptr;
-
-    if (!(elem = malloc(sizeof (CameraListElem)))) {
->>>>>>> ca61faa583a9f4677977a90d6a36d6b63efa9210
-=======
-int addNewCameraList(CameraList **list, RcdCameraObj *camera) {
-    CameraListElem *elem, *ptr;
-
-    if (!(elem = malloc(sizeof (CameraListElem)))) {
->>>>>>> ca61faa583a9f4677977a90d6a36d6b63efa9210
         rcd_perror("malloc");
 
         return -1;
@@ -65,18 +52,9 @@ int addNewCameraList(CameraList **list, RcdCameraObj *camera) {
     return 0;
 }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
+
 void printCameraList(RcdCameraList **list) {
     RcdCameraListElem *ptr = *list;
-=======
-void printCameraList(CameraList **list) {
-    CameraListElem *ptr = *list;
->>>>>>> ca61faa583a9f4677977a90d6a36d6b63efa9210
-=======
-void printCameraList(CameraList **list) {
-    CameraListElem *ptr = *list;
->>>>>>> ca61faa583a9f4677977a90d6a36d6b63efa9210
 
     while (ptr) {
         pdebug("Camera list element: %s - %s", ptr->camera->camera_name, ptr->camera->camera_port);
@@ -84,18 +62,8 @@ void printCameraList(CameraList **list) {
     }
 }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
 RcdCameraListElem *searchCameraList(RcdCameraList **list, char *camera_port) {
     RcdCameraListElem *ptr = *list;
-=======
-CameraListElem *searchCameraList(CameraList **list, char *camera_port) {
-    CameraListElem *ptr = *list;
->>>>>>> ca61faa583a9f4677977a90d6a36d6b63efa9210
-=======
-CameraListElem *searchCameraList(CameraList **list, char *camera_port) {
-    CameraListElem *ptr = *list;
->>>>>>> ca61faa583a9f4677977a90d6a36d6b63efa9210
 
     while (ptr) {
         if (!rcdCompareString(ptr->camera->camera_port, camera_port, strlen(ptr->camera->camera_port)))
@@ -107,21 +75,9 @@ CameraListElem *searchCameraList(CameraList **list, char *camera_port) {
     return NULL;
 }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
 int deleteCameraList(RcdCameraList **list, RcdCameraListElem *elem) {
     RcdCameraListElem *ptr = *list;
     RcdCameraListElem *prev = NULL;
-=======
-int deleteCameraList(CameraList **list, CameraListElem *elem) {
-    CameraListElem *ptr = *list;
-    CameraListElem *prev = NULL;
->>>>>>> ca61faa583a9f4677977a90d6a36d6b63efa9210
-=======
-int deleteCameraList(CameraList **list, CameraListElem *elem) {
-    CameraListElem *ptr = *list;
-    CameraListElem *prev = NULL;
->>>>>>> ca61faa583a9f4677977a90d6a36d6b63efa9210
 
     while (ptr && ptr != elem) {
         prev = ptr;

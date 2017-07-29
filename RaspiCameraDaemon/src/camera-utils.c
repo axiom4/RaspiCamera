@@ -60,7 +60,7 @@ GPContext* createContext() {
     return context;
 }
 
-int rcd_autodetect(RcdCameraList *list, GPContext *context) {
+int rcd_autodetect(CameraList *list, GPContext *context) {
     gp_list_reset(list);
     return gp_camera_autodetect(list, context);
 }
@@ -117,7 +117,7 @@ static void stop_timeout_func(Camera *camera, unsigned int id, void *data) {
 }
 
 void folder_list_files(Camera *camera, const char *folder, GPContext *context) {
-    RcdCameraList *list;
+    CameraList *list;
     int i;
 
     gp_list_new(&list);
@@ -139,7 +139,7 @@ void folder_list_files(Camera *camera, const char *folder, GPContext *context) {
 }
 
 void folder_list_folders(Camera *camera, const char *folder, GPContext *context) {
-    RcdCameraList *list;
+    CameraList *list;
     int i;
 
     if (*folder == '\0')
@@ -283,7 +283,7 @@ RcdCameraObj *newCamera(int idVendor, int productId, char *camera_port) {
     int i, count;
     RcdCameraObj *newCamera = NULL;
 
-    RcdCameraList *tmpCameraList = NULL;
+    CameraList *tmpCameraList = NULL;
     //GPContext *context = create_context();
 
     const char *c_name = NULL;
@@ -369,19 +369,10 @@ void gphotoFree() {
     gp_context_unref(config.context);
 }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
+
 void freeCameraList(RcdCameraList **list) {
     RcdCameraListElem *ptr = *list;
-=======
-void freeCameraList(CameraList **list) {
-    CameraListElem *ptr = *list;
->>>>>>> ca61faa583a9f4677977a90d6a36d6b63efa9210
-=======
-void freeCameraList(CameraList **list) {
-    CameraListElem *ptr = *list;
->>>>>>> ca61faa583a9f4677977a90d6a36d6b63efa9210
-
+    
     while (ptr) {
         freeCamera(ptr->camera);
         deleteCameraList(list, ptr);
