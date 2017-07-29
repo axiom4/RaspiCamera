@@ -24,7 +24,7 @@
 
 #include <RaspiCameraDaemon.h>
 
-int rcd_daemon_init() {
+int rcdDaemonInit() {
     int i;
     pid_t pid;
 
@@ -38,7 +38,7 @@ int rcd_daemon_init() {
     if (setsid() < 0) /* become session leader */
         return (-1);
 
-    rcd_signal(SIGHUP, SIG_IGN);
+    rcdSignal(SIGHUP, SIG_IGN);
     if ((pid = fork()) < 0)
         return (-1);
     else if (pid)

@@ -45,16 +45,16 @@ static void add_device(libusb_device *dev) {
     asprintf(&port, "usb:%03d,%03d", libusb_get_bus_number(dev), libusb_get_device_address(dev));
 
     if ((camera = newCamera(desc.idVendor, desc.idProduct, port)))
-        add_new_camera_list(&config.camera_list, camera);
+        addNewCameraList(&config.camera_list, camera);
 
-    print_camera_list(&config.camera_list);
+    printCameraList(&config.camera_list);
 
     free(port);
 }
 
 static void delete_device(libusb_device *dev) {
     char *port;
-    struct camera_list_elem *camera;
+    struct CameraListElem *camera;
     struct libusb_device_descriptor desc;
     int r = libusb_get_device_descriptor(dev, &desc);
 
@@ -70,15 +70,15 @@ static void delete_device(libusb_device *dev) {
 
     asprintf(&port, "usb:%03d,%03d", libusb_get_bus_number(dev), libusb_get_device_address(dev));
 
-    if ((camera = search_camera_list(&config.camera_list, port))) {
+    if ((camera = searchCameraList(&config.camera_list, port))) {
         pinfo("Remove Camera: %s (%s)", camera->camera->camera_name, camera->camera->camera_port);
        
         freeCamera(camera->camera);
         
-        delete_camera_list(&config.camera_list, camera);
+        deleteCameraList(&config.camera_list, camera);
     }
 
-    print_camera_list(&config.camera_list);
+    printCameraList(&config.camera_list);
 
     free(port);
 }
@@ -120,7 +120,7 @@ static void add_dev_list(libusb_device **devs) {
     }
 }
 
-void *rcd_usb_device_connection_init(void *t) {
+void *rcdUsbDeviceConnectionInit(void *t) {
     libusb_hotplug_callback_handle hp[2];
     int product_id, vendor_id, class_id;
     int rc;

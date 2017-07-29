@@ -24,10 +24,10 @@
 
 #include <RaspiCameraDaemon.h>
 
-int add_new_camera_list(camera_list **list, RcdCameraObj *camera) {
-    camera_list_elem *elem, *ptr;
+int addNewCameraList(CameraList **list, RcdCameraObj *camera) {
+    CameraListElem *elem, *ptr;
 
-    if (!(elem = malloc(sizeof (camera_list_elem)))) {
+    if (!(elem = malloc(sizeof (CameraListElem)))) {
         rcd_perror("malloc");
 
         return -1;
@@ -51,8 +51,8 @@ int add_new_camera_list(camera_list **list, RcdCameraObj *camera) {
     return 0;
 }
 
-void print_camera_list(camera_list **list) {
-    camera_list_elem *ptr = *list;
+void printCameraList(CameraList **list) {
+    CameraListElem *ptr = *list;
 
     while (ptr) {
         pdebug("Camera list element: %s - %s", ptr->camera->camera_name, ptr->camera->camera_port);
@@ -60,8 +60,8 @@ void print_camera_list(camera_list **list) {
     }
 }
 
-camera_list_elem *search_camera_list(camera_list **list, char *camera_port) {
-    camera_list_elem *ptr = *list;
+CameraListElem *searchCameraList(CameraList **list, char *camera_port) {
+    CameraListElem *ptr = *list;
 
     while (ptr) {
         if (!rcdCompareString(ptr->camera->camera_port, camera_port, strlen(ptr->camera->camera_port)))
@@ -73,9 +73,9 @@ camera_list_elem *search_camera_list(camera_list **list, char *camera_port) {
     return NULL;
 }
 
-int delete_camera_list(camera_list **list, camera_list_elem *elem) {
-    camera_list_elem *ptr = *list;
-    camera_list_elem *prev = NULL;
+int deleteCameraList(CameraList **list, CameraListElem *elem) {
+    CameraListElem *ptr = *list;
+    CameraListElem *prev = NULL;
 
     while (ptr && ptr != elem) {
         prev = ptr;

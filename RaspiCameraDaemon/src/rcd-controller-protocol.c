@@ -22,36 +22,3 @@
  * THE SOFTWARE.
  */
 
-#include <RaspiCameraDaemon.h>
-
-void (*rcdSignal(int signo, void (*func)(int)))(int) {
-    struct sigaction act, oact;
-    act.sa_handler = func;
-    sigemptyset(&act.sa_mask);
-    act.sa_flags = 0;
-    if (signo == SIGALRM) {
-#ifdef SA_INTERRUPT
-        act.sa_flags |= SA_INTERRUPT; /* SunOS 4.x */
-#endif
-    } else {
-#ifdef SA_RESTART
-        act.sa_flags |= SA_RESTART; /* SVR4, 4.4BSD, Linux */
-#endif
-    }
-
-    if (sigaction(signo, &act, &oact) == -1)
-        return SIG_ERR;
-
-    return (oact.sa_handler);
-}
-
-void rcdSignalPipe(int signo) {
-    return;
-}
-
-void rcdSignalTerm(int signo) {
-    if (signo == SIGINT || signo == SIGTERM) {
-        rcd_exit = 1;
-        controllerSocketFree();
-    }
-}

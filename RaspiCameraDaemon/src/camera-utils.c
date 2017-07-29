@@ -39,7 +39,7 @@ static void ctx_message_func(GPContext *context, const char *str, void *data) {
     fflush(stderr);
 }
 
-GPContext* create_context() {
+GPContext* createContext() {
     GPContext *context;
 
     /* This is the mandatory part */
@@ -303,7 +303,7 @@ RcdCameraObj *newCamera(int idVendor, int productId, char *camera_port) {
                     newCamera = malloc(sizeof (RcdCameraObj));
 
                     if (open_camera(&newCamera->camera, c_name, c_port, config.context) == GP_OK) {
-                        newCamera->context = create_context();
+                        newCamera->context = createContext();
 
                         asprintf(&newCamera->camera_name, "%s", c_name);
                         asprintf(&newCamera->camera_port, "%s", c_port);
@@ -361,20 +361,20 @@ void freeCamera(RcdCameraObj *camera) {
     free(camera->camera_port);
 }
 
-int gphoto_init() {
-    config.context = create_context();
+int gphotoInit() {
+    config.context = createContext();
 }
 
-void gphoto_free() {
+void gphotoFree() {
     gp_context_unref(config.context);
 }
 
-void free_camera_list(camera_list **list) {
-    camera_list_elem *ptr = *list;
+void freeCameraList(CameraList **list) {
+    CameraListElem *ptr = *list;
 
     while (ptr) {
         freeCamera(ptr->camera);
-        delete_camera_list(list, ptr);
+        deleteCameraList(list, ptr);
         ptr = *list;
     }
 }
