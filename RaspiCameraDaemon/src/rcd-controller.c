@@ -24,7 +24,7 @@
 
 #include <RaspiCameraDaemon.h>
 
-void controller_socket_init() {
+void controllerSocketInit() {
     int ret;
     struct sockaddr_un name;
 
@@ -56,7 +56,7 @@ void controller_socket_init() {
 
 }
 
-void controller_accept() {
+void controllerAccept() {
     int data_socket;
     int result;
     char buffer[4096];
@@ -69,7 +69,7 @@ void controller_accept() {
     }
 
     while (1) {
-        result = read(data_socket, buffer, 4096);
+        result = rcdReadline(data_socket, buffer, 4096);
 
         if (result > 0)
             pinfo("%s", buffer);
@@ -80,7 +80,7 @@ void controller_accept() {
     }
 }
 
-void controller_socket_free() {
+void controllerSocketFree() {
     if (config.controller_socket > 0) {
         close(config.controller_socket);
     }

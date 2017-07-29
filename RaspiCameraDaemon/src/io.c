@@ -64,7 +64,7 @@ again:
     return (1);
 }
 
-ssize_t rcd_readline(int fd, void *vptr, size_t maxlen) {
+ssize_t rcdReadline(int fd, void *vptr, size_t maxlen) {
     size_t n, rc;
     char c, *ptr;
     rline *tsd;
@@ -103,7 +103,7 @@ ssize_t rcd_readline(int fd, void *vptr, size_t maxlen) {
 }
 
 /* socket recive */
-ssize_t rcd_read_n_bytes(int fd, void *vptr, size_t n) {
+ssize_t rcdReadNBytes(int fd, void *vptr, size_t n) {
     size_t nleft;
     ssize_t nread;
     char *ptr;
@@ -148,7 +148,7 @@ ssize_t rcd_write_n_bytes(int fd, void *vptr, size_t n) {
     return (n - nleft); /* return >= 0 */
 }
 
-ssize_t rcd_writeline(int fd, const char *str) {
+ssize_t rcdWriteline(int fd, const char *str) {
 
     if (str)
         return rcd_write_n_bytes(fd, (void *) str, strlen(str));
@@ -175,4 +175,24 @@ again:
         }
     }
     return confd;
+}
+
+size_t rcdRead(int fd, void *buf, size_t count) {
+    size_t n;
+again:
+    if ((n = read(fd, buf, count)) < 0) {
+
+#ifdef  EPROTO
+        if (errno == EPROTO || errno == ECONNABORTED)
+            goto again;
+#else
+        if (errno == ECONNABORTED)
+            goto again;
+#endif
+
+        if (errno == EINTR) {
+            goto again;
+        }
+    }
+    return n;
 }

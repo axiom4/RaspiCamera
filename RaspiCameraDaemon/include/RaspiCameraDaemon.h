@@ -82,7 +82,7 @@ struct RcdCameraConfig {
     int camera_timeout;
 };
 
-typedef struct camera_object {
+typedef struct CameraObject {
     Camera *camera;
     char *camera_port;
     char *camera_name;
@@ -92,13 +92,13 @@ typedef struct camera_object {
     RcdThreadData t_camera_monitor;    
 } RcdCameraObj;
 
-typedef struct camera_list_elem {
+typedef struct RcdCameraListElem {
     RcdCameraObj *camera;
     
-    struct camera_list_elem *next;
-} camera_list_elem; 
+    struct RcdCameraListElem *next;
+} RcdCameraListElem; 
 
-typedef struct camera_list_elem camera_list;
+typedef struct RcdCameraListElem RcdCameraList;
 
 struct _RcdRunConfig {
     const char *configfile;
@@ -111,7 +111,7 @@ struct _RcdRunConfig {
 
     RcdThreadData t_usb_detect;
     
-    camera_list *camera_list;
+    RcdCameraList *camera_list;
     
     int controller_socket;
 
@@ -125,20 +125,20 @@ extern int rcd_exit;
 extern RcdRunConfig config;
 
 /* signal.c */
-void (*rcd_signal(int signo, void (*func)(int)))(int);
-void rcd_sig_pipe(int signo);
-void rcd_sig_term(int signo);
+void (*rcdSignal(int signo, void (*func)(int)))(int);
+void rcdSignalPipe(int signo);
+void rcdSignalTerm(int signo);
 
 /* daemon.c */
-int rcd_daemon_init();
+int rcdDaemonInit();
 
 /* usb_device.c */
-void *rcd_usb_device_connection_init(void *t);
+void *rcdUsbDeviceConnectionInit(void *t);
 
 /* config.c */
-void config_init(RcdRunConfig *config);
-void rcd_config_parse(const char *filename, RcdRunConfig *config);
-void config_free(RcdRunConfig *config);
+void rcdConfigInit(RcdRunConfig *config);
+void rcdConfigParse(const char *filename, RcdRunConfig *config);
+void rcdConfigFree(RcdRunConfig *config);
 
 /* logging.c */
 void pinfo(char *s, ...);
@@ -148,10 +148,11 @@ void pwarn(char *s, ...);
 void rcd_perror(const char *str);
 
 /* io.c */
-ssize_t rcd_readline(int fd, void *vptr, size_t maxlen);
-ssize_t rcd_writeline(int fd, const char *str);
+ssize_t rcdReadline(int fd, void *vptr, size_t maxlen);
+ssize_t rcdWriteline(int fd, const char *str);
 int rcdAccept(int sockfd, struct sockaddr *addr, socklen_t *addrlen);
-ssize_t rcd_read_n_bytes(int fd, void *vptr, size_t n);
+ssize_t rcdReadNBytes(int fd, void *vptr, size_t n);
+size_t rcdRead(int fd, void *buf, size_t count);
 
 /* utils.c */
 char * rcdStringToLower(const char *string);
@@ -162,23 +163,23 @@ char * rcdTrim(char * string);
 void rcdChomp(char *str);
 
 /* camera-list.c */
-int add_new_camera_list(camera_list **list, RcdCameraObj *camera);
-int delete_camera_list(camera_list **list, camera_list_elem *elem);
-void print_camera_list(camera_list **list);
-struct camera_list_elem *search_camera_list(camera_list **list, char *camera_port);
+int addNewCameraList(RcdCameraList **list, RcdCameraObj *camera);
+int deleteCameraList(RcdCameraList **list, RcdCameraListElem *elem);
+void printCameraList(RcdCameraList **list);
+struct RcdCameraListElem *searchCameraList(RcdCameraList **list, char *camera_port);
 
 /* camera-utils.c */
-GPContext* create_context();
-int gphoto_init();
-void gphoto_free();
+GPContext* createContext();
+int gphotoInit();
+void gphotoFree();
 RcdCameraObj * newCamera(int idVendor, int productId, char *camera_port);
 void freeCamera(RcdCameraObj *camera);
-void free_camera_list(camera_list **list);
+void freeCameraList(RcdCameraList **list);
 
 /* rcd-controller */
-void controller_socket_init();
-void controller_accept();
-void controller_socket_free();
+void controllerSocketInit();
+void controllerAccept();
+void controllerSocketFree();
 
 #endif /* RASPICAMERADAEMON_H */
 

@@ -42,6 +42,7 @@ OBJECTFILES= \
 	${OBJECTDIR}/src/io.o \
 	${OBJECTDIR}/src/logging.o \
 	${OBJECTDIR}/src/main.o \
+	${OBJECTDIR}/src/rcd-controller-protocol.o \
 	${OBJECTDIR}/src/rcd-controller.o \
 	${OBJECTDIR}/src/signal.o \
 	${OBJECTDIR}/src/usb_device.o \
@@ -106,6 +107,11 @@ ${OBJECTDIR}/src/main.o: src/main.c
 	${MKDIR} -p ${OBJECTDIR}/src
 	${RM} "$@.d"
 	$(COMPILE.c) -g -I/home/pi/arch/include -Iinclude -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/main.o src/main.c
+
+${OBJECTDIR}/src/rcd-controller-protocol.o: src/rcd-controller-protocol.c
+	${MKDIR} -p ${OBJECTDIR}/src
+	${RM} "$@.d"
+	$(COMPILE.c) -g -I/home/pi/arch/include -Iinclude -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/rcd-controller-protocol.o src/rcd-controller-protocol.c
 
 ${OBJECTDIR}/src/rcd-controller.o: src/rcd-controller.c
 	${MKDIR} -p ${OBJECTDIR}/src

@@ -52,14 +52,14 @@ int main(int argc, char** argv) {
     int c, ret;
     int option_index = 0;
 
-    config_init(&config);
+    rcdConfigInit(&config);
 
     config.app_name = basename(argv[0]);
 
-    rcd_signal(SIGINT, &rcd_sig_term);
-    rcd_signal(SIGTERM, &rcd_sig_term);
+    rcdSignal(SIGINT, &rcdSignalTerm);
+    rcdSignal(SIGTERM, &rcdSignalTerm);
 
-    rcd_signal(SIGPIPE, &rcd_sig_pipe);
+    rcdSignal(SIGPIPE, &rcdSignalPipe);
 
     openlog(config.app_name, 0, LOG_DAEMON);
 
@@ -89,24 +89,24 @@ int main(int argc, char** argv) {
 
     pinfo("Starting %s", config.app_name);
 
-    rcd_config_parse(config.configfile, &config);
+    rcdConfigParse(config.configfile, &config);
 
     if (rcd_exit)
         exit(-1);
 
     if (config.daemonize)
-        rcd_daemon_init();
+        rcdDaemonInit();
 
     pinfo("controller initialization");
-    controller_socket_init();
+    controllerSocketInit();
 
     pinfo("init camera module");
-    gphoto_init();
+    gphotoInit();
 
     pthread_attr_init(&config.t_usb_detect.attr);
     pthread_attr_setdetachstate(&config.t_usb_detect.attr, PTHREAD_CREATE_JOINABLE);
 
-    ret = pthread_create(&config.t_usb_detect.thread, &config.t_usb_detect.attr, rcd_usb_device_connection_init, NULL);
+    ret = pthread_create(&config.t_usb_detect.thread, &config.t_usb_detect.attr, rcdUsbDeviceConnectionInit, NULL);
 
     if (ret) {
         perr("return code from pthread_create() is %d", ret);
@@ -115,11 +115,11 @@ int main(int argc, char** argv) {
 
 
     while (!rcd_exit) {
-        controller_accept();
+        controllerAccept();
     }
 
     pinfo("closing controller");
-    controller_socket_free();
+    controllerSocketFree();
 
     pthread_attr_destroy(&config.t_usb_detect.attr);
     ret = pthread_join(config.t_usb_detect.thread, &config.t_usb_detect.status);
@@ -132,14 +132,14 @@ int main(int argc, char** argv) {
     closelog();
 
     pinfo("free camera module");
-    gphoto_free();
+    gphotoFree();
 
     pinfo("Free camera list memory");
-    free_camera_list(&config.camera_list);
+    freeCameraList(&config.camera_list);
 
     pinfo("%s terminated!", config.app_name);
 
-    config_free(&config);
+    rcdConfigFree(&config);
 
     pthread_exit(NULL);
 }

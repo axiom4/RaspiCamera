@@ -35,7 +35,7 @@ typedef enum {
     CAMERA
 } rcd_section;
 
-void config_init(RcdRunConfig *config) {
+void rcdConfigInit(RcdRunConfig *config) {
     config->configfile = NULL;
     config->debug = 0;
     config->daemonize = 0;
@@ -111,7 +111,7 @@ int rcdParseTokenSection(const char *cmd, const char *token) {
     return (!len ? 1 : 0);
 }
 
-void rcd_config_parse(const char *filename, RcdRunConfig *config) {
+void rcdConfigParse(const char *filename, RcdRunConfig *config) {
     int config_fd;
     struct stat sb;
     char buffer[MAXLINE];
@@ -143,7 +143,7 @@ void rcd_config_parse(const char *filename, RcdRunConfig *config) {
 
     bzero(buffer, MAXLINE);
 
-    while ((ret = rcd_readline(config_fd, buffer, MAXLINE)) > 0) {
+    while ((ret = rcdReadline(config_fd, buffer, MAXLINE)) > 0) {
         rcdChomp(buffer);
         rcdTrim(buffer);
         line++;
@@ -257,7 +257,7 @@ void rcd_config_parse(const char *filename, RcdRunConfig *config) {
     }
 
     if (parse_error) {
-        config_free(config);
+        rcdConfigFree(config);
         
         rcd_exit = 1;
     }
@@ -266,7 +266,7 @@ void rcd_config_parse(const char *filename, RcdRunConfig *config) {
         close(config_fd);
 }
 
-void config_free(RcdRunConfig *config) {
+void rcdConfigFree(RcdRunConfig *config) {
     if (config->rcd_config.log_facility) {
         free(config->rcd_config.log_facility);
         config->rcd_config.log_facility = NULL;

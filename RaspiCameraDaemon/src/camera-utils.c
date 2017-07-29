@@ -39,7 +39,7 @@ static void ctx_message_func(GPContext *context, const char *str, void *data) {
     fflush(stderr);
 }
 
-GPContext* create_context() {
+GPContext* createContext() {
     GPContext *context;
 
     /* This is the mandatory part */
@@ -60,7 +60,7 @@ GPContext* create_context() {
     return context;
 }
 
-int rcd_autodetect(CameraList *list, GPContext *context) {
+int rcd_autodetect(RcdCameraList *list, GPContext *context) {
     gp_list_reset(list);
     return gp_camera_autodetect(list, context);
 }
@@ -117,7 +117,7 @@ static void stop_timeout_func(Camera *camera, unsigned int id, void *data) {
 }
 
 void folder_list_files(Camera *camera, const char *folder, GPContext *context) {
-    CameraList *list;
+    RcdCameraList *list;
     int i;
 
     gp_list_new(&list);
@@ -139,7 +139,7 @@ void folder_list_files(Camera *camera, const char *folder, GPContext *context) {
 }
 
 void folder_list_folders(Camera *camera, const char *folder, GPContext *context) {
-    CameraList *list;
+    RcdCameraList *list;
     int i;
 
     if (*folder == '\0')
@@ -283,7 +283,7 @@ RcdCameraObj *newCamera(int idVendor, int productId, char *camera_port) {
     int i, count;
     RcdCameraObj *newCamera = NULL;
 
-    CameraList *tmpCameraList = NULL;
+    RcdCameraList *tmpCameraList = NULL;
     //GPContext *context = create_context();
 
     const char *c_name = NULL;
@@ -303,7 +303,7 @@ RcdCameraObj *newCamera(int idVendor, int productId, char *camera_port) {
                     newCamera = malloc(sizeof (RcdCameraObj));
 
                     if (open_camera(&newCamera->camera, c_name, c_port, config.context) == GP_OK) {
-                        newCamera->context = create_context();
+                        newCamera->context = createContext();
 
                         asprintf(&newCamera->camera_name, "%s", c_name);
                         asprintf(&newCamera->camera_port, "%s", c_port);
@@ -361,20 +361,20 @@ void freeCamera(RcdCameraObj *camera) {
     free(camera->camera_port);
 }
 
-int gphoto_init() {
-    config.context = create_context();
+int gphotoInit() {
+    config.context = createContext();
 }
 
-void gphoto_free() {
+void gphotoFree() {
     gp_context_unref(config.context);
 }
 
-void free_camera_list(camera_list **list) {
-    camera_list_elem *ptr = *list;
+void freeCameraList(RcdCameraList **list) {
+    RcdCameraListElem *ptr = *list;
 
     while (ptr) {
         freeCamera(ptr->camera);
-        delete_camera_list(list, ptr);
+        deleteCameraList(list, ptr);
         ptr = *list;
     }
 }
