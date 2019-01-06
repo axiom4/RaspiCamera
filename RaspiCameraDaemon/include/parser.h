@@ -22,37 +22,24 @@
  * THE SOFTWARE.
  */
 
+/* 
+ * File:   parser.h
+ * Author: Riccardo Giannetto <rgiannetto at gmail.com>
+ *
+ * Created on 29 luglio 2017, 18.08
+ */
 
-#include <RaspiCameraDaemon.h>
-#include <parser.h>
+#ifndef PARSER_H
+#define PARSER_H
 
-#define WERR_COMMAND rcdWriteline(socket, "500 Error: invalid command\r\n")
+struct token {
+    char *token;
+    char *nexttoken;
+};
 
-void rcdControllerProtocol(int socket, char *buf) {
-    struct token tk;
+char * rcdReadToken(const char *line, struct token *tk);
+int rcdParseToken(const char *cmd, const char *token);
+int rcdParseTokenSection(const char *cmd, const char *token);
 
-    rcdChomp(buf);
+#endif /* PARSER_H */
 
-    pdebug("%s", buf);
-
-    tk.token = rcdReadToken(rcdTrim(buf), &tk);
-
-    if (rcdParseToken(tk.token, "show")) {
-        if (!(tk.token = rcdReadToken(tk.nexttoken, &tk))) {
-            WERR_COMMAND;
-        }
-
-        if (rcdParseToken(tk.token, "connected")) {
-            if (tk.nexttoken) {
-                WERR_COMMAND;
-            } else {
-                rcdWriteline(socket, "200 OK\r\n");
-            }
-        } else {
-            WERR_COMMAND;
-        }
-
-    } else {
-        WERR_COMMAND;
-    }
-}

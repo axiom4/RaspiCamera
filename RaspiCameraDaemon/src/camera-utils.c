@@ -238,7 +238,7 @@ int open_camera(Camera **camera, const char *model, const char *port, GPContext 
     }
     if (p < GP_OK)
         return p;
-
+    
     ret = gp_port_info_list_get_info(portinfolist, p, &pi);
     if (ret < GP_OK)
         return ret;
@@ -246,7 +246,7 @@ int open_camera(Camera **camera, const char *model, const char *port, GPContext 
     ret = gp_camera_set_port_info(*camera, pi);
     if (ret < GP_OK)
         return ret;
-
+    
     gp_abilities_list_free(abilities);
     gp_port_info_list_free(portinfolist);
 
@@ -269,6 +269,8 @@ void *rcd_camera_monitor_thread(void *t) {
 
         if (ret < GP_OK) {
             perr("Camera failed retrieving summary. [%s (%s)]", camera->camera_name, camera->camera_port);
+            gp_port_free(camera->camera->port);
+
             gp_camera_free(camera->camera);
 
             camera->t_camera_monitor.thread_exit = 1;

@@ -59,25 +59,29 @@ void controllerSocketInit() {
 void controllerAccept() {
     int data_socket;
     int result;
-    char buffer[4096];
+    char buffer[MAXLINE];
     /* Wait for incoming connection. */
 
     data_socket = rcdAccept(config.controller_socket, NULL, NULL);
     if (data_socket < 0) {
-        rcd_perror("accept");
+        if (!rcd_exit)
+            rcd_perror("accept");
         return;
     }
 
     while (1) {
+        bzero(buffer, MAXLINE);
+        result = rcdReadline(data_socket, buffer, MAXLINE);
 
-        result = rcdReadline(data_socket, buffer, 4096);
+        if (result > 0) {
+            if (!*buffer)
+                continue;
 
-        if (result > 0)
-            pinfo("%s", buffer);
-        else if (result == 0) {
-            close(data_socket);
-            break;
+            rcdControllerProtocol(data_socket, buffer);
         }
+
+        if (result <= 0)
+            close(data_socket);
     }
 }
 

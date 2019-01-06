@@ -23,11 +23,7 @@
  */
 
 #include <RaspiCameraDaemon.h>
-
-struct token {
-    char *token;
-    char *nexttoken;
-};
+#include <parser.h>
 
 typedef enum {
     UNKNOWN,
@@ -46,69 +42,6 @@ void rcdConfigInit(RcdRunConfig *config) {
     config->camera_list = NULL;
     config->controller_socket = 0;
     config->context = NULL;
-}
-
-char * rcdReadToken(const char *line, struct token *tk) {
-    int c = 0;
-    char *ptr = (char *) line;
-
-    tk->token = (char *) line;
-    tk->nexttoken = NULL;
-
-    if (!ptr)
-        return NULL;
-
-    while ((c = (int) *ptr)) {
-        if (c == ' ' || c == '\t') {
-            *ptr = '\0';
-            ptr++;
-
-            while (*ptr == ' ' || *ptr == '\t') {
-                *ptr = '\0';
-                ptr++;
-            }
-
-            if (*ptr == '\r')
-                tk->nexttoken = NULL;
-            else
-                tk->nexttoken = ptr;
-
-            break;
-        } else if (c == '\r' || c == '\n') {
-            *ptr = '\0';
-            tk->nexttoken = NULL;
-            break;
-        }
-        ptr++;
-    }
-
-    return tk->token;
-}
-
-int rcdParseToken(const char *cmd, const char *token) {
-    ssize_t len = 0;
-    char *str;
-
-    if (cmd && token) {
-        str = rcdStringToLower((char *) cmd);
-        len = strcmp(str, token);
-        free(str);
-    }
-
-    return (!len ? 1 : 0);
-}
-
-int rcdParseTokenSection(const char *cmd, const char *token) {
-    ssize_t len = 0;
-    char *str;
-
-    if (cmd && token) {
-        str = rcdStringToLower((char *) cmd);
-        len = rcdCompareString(str, token, strlen(token));
-        free(str);
-    }
-
-    return (!len ? 1 : 0);
 }
 
 void rcdConfigParse(const char *filename, RcdRunConfig *config) {

@@ -151,7 +151,7 @@ ssize_t rcdWriteNBytes(int fd, void *vptr, size_t n) {
 ssize_t rcdWriteline(int fd, const char *str) {
 
     if (str)
-        return rcd_write_n_bytes(fd, (void *) str, strlen(str));
+        return rcdWriteNBytes(fd, (void *) str, strlen(str));
 
     return -1;
 }

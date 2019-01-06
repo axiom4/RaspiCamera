@@ -21,7 +21,7 @@ FC=gfortran
 AS=as
 
 # Macros
-CND_PLATFORM=GNU-Linux
+CND_PLATFORM=None-Linux
 CND_DLIB_EXT=so
 CND_CONF=Debug
 CND_DISTDIR=dist
@@ -42,6 +42,7 @@ OBJECTFILES= \
 	${OBJECTDIR}/src/io.o \
 	${OBJECTDIR}/src/logging.o \
 	${OBJECTDIR}/src/main.o \
+	${OBJECTDIR}/src/parser.o \
 	${OBJECTDIR}/src/rcd-controller-protocol.o \
 	${OBJECTDIR}/src/rcd-controller.o \
 	${OBJECTDIR}/src/signal.o \
@@ -107,6 +108,11 @@ ${OBJECTDIR}/src/main.o: src/main.c
 	${MKDIR} -p ${OBJECTDIR}/src
 	${RM} "$@.d"
 	$(COMPILE.c) -g -I/home/pi/arch/include -Iinclude -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/main.o src/main.c
+
+${OBJECTDIR}/src/parser.o: src/parser.c
+	${MKDIR} -p ${OBJECTDIR}/src
+	${RM} "$@.d"
+	$(COMPILE.c) -g -I/home/pi/arch/include -Iinclude -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/parser.o src/parser.c
 
 ${OBJECTDIR}/src/rcd-controller-protocol.o: src/rcd-controller-protocol.c
 	${MKDIR} -p ${OBJECTDIR}/src

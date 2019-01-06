@@ -5,6 +5,7 @@
                    displayName="Header Files"
                    projectFiles="true">
       <itemPath>include/RaspiCameraDaemon.h</itemPath>
+      <itemPath>include/parser.h</itemPath>
     </logicalFolder>
     <logicalFolder name="ResourceFiles"
                    displayName="Resource Files"
@@ -21,6 +22,7 @@
       <itemPath>src/io.c</itemPath>
       <itemPath>src/logging.c</itemPath>
       <itemPath>src/main.c</itemPath>
+      <itemPath>src/parser.c</itemPath>
       <itemPath>src/rcd-controller-protocol.c</itemPath>
       <itemPath>src/rcd-controller.c</itemPath>
       <itemPath>src/signal.c</itemPath>
@@ -82,6 +84,8 @@
       </folder>
       <item path="include/RaspiCameraDaemon.h" ex="false" tool="3" flavor2="0">
       </item>
+      <item path="include/parser.h" ex="false" tool="3" flavor2="0">
+      </item>
       <item path="src/camera-list.c" ex="false" tool="0" flavor2="0">
       </item>
       <item path="src/camera-utils.c" ex="false" tool="0" flavor2="0">
@@ -95,6 +99,8 @@
       <item path="src/logging.c" ex="false" tool="0" flavor2="0">
       </item>
       <item path="src/main.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="src/parser.c" ex="false" tool="0" flavor2="0">
       </item>
       <item path="src/rcd-controller-protocol.c" ex="false" tool="0" flavor2="0">
       </item>
@@ -131,6 +137,8 @@
       </item>
       <item path="include/RaspiCameraDaemon.h" ex="false" tool="3" flavor2="0">
       </item>
+      <item path="include/parser.h" ex="false" tool="3" flavor2="0">
+      </item>
       <item path="src/camera-list.c" ex="false" tool="0" flavor2="0">
       </item>
       <item path="src/camera-utils.c" ex="false" tool="0" flavor2="0">
@@ -144,6 +152,8 @@
       <item path="src/logging.c" ex="false" tool="0" flavor2="0">
       </item>
       <item path="src/main.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="src/parser.c" ex="false" tool="0" flavor2="0">
       </item>
       <item path="src/rcd-controller-protocol.c" ex="false" tool="0" flavor2="0">
       </item>

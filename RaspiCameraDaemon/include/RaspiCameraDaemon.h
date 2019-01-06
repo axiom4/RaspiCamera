@@ -181,5 +181,8 @@ void controllerSocketInit();
 void controllerAccept();
 void controllerSocketFree();
 
+/* rcd-controller-protocol.c */
+void rcdControllerProtocol(int socket, char *buf);
+
 #endif /* RASPICAMERADAEMON_H */
 
